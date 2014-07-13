@@ -19,8 +19,6 @@ class PostDiff(object):
 
   def _diff_(self, idiff, change_type):
     ret = []
-
-    print idiff, change_type
     for v in idiff.iter_change_type(change_type):
       file_name = None
       if v.a_blob:

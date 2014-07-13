@@ -1,7 +1,7 @@
 import md
 import os
 import diff
-
+import mgr
 import json
 from datetime import datetime
 
@@ -11,9 +11,7 @@ class GeneratedRainbowCoder(object):
   post_dir = './post'
 
   def __init__(self):
-    handle = open('cfg.json', 'r')
-    self.cfg = json.loads(handle.read())
-    handle.close()
+    self.cfg = mgr.cfg
     self.idiff = diff.PostDiff()
 
   def _is_post(self, file_name):

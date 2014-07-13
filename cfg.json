@@ -1,5 +1,6 @@
 {
   "css": "css/github.css",
   "head_md": "header.md",
-  "index_md": "post/index.md"
+  "index_md": "post/index.md",
+  "service_port": 9528
 }
