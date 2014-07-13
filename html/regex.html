@@ -1,0 +1,65 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" type="text/css" href="css/github.css"><title>regex</title></head><body><h1>regex</h1>
+
+<p>a pure C implementation of simple regular express engine.</p>
+
+<p>Just for fun. ;)</p>
+
+<h2>pattern</h2>
+
+<table>
+<thead><tr>
+<th align="center">pattern</th>
+<th align="center">describe</th>
+</tr></thead>
+<tbody>
+<tr>
+<td align="center"><code>ab</code></td>
+<td align="center">matches <code>a</code> followed by <code>b</code>
+</td>
+</tr>
+<tr>
+<td align="center"><a href="https://camo.githubusercontent.com/fc5c224b9adec5f93058da3163fbdc3eb2732706/687474703a2f2f692e696d6775722e636f6d2f6a3247546c4b322e706e67" target="_blank"><img src="https://camo.githubusercontent.com/fc5c224b9adec5f93058da3163fbdc3eb2732706/687474703a2f2f692e696d6775722e636f6d2f6a3247546c4b322e706e67" height="30" width="60" data-canonical-src="http://i.imgur.com/j2GTlK2.png" style="max-width:100%;"></a></td>
+<td align="center">matches <code>a</code> or <code>b</code> (ordered)</td>
+</tr>
+<tr>
+<td align="center"><code>a*</code></td>
+<td align="center">matches at least 0 repetitions of <code>a</code>
+</td>
+</tr>
+<tr>
+<td align="center"><code>[a-b]</code></td>
+<td align="center">matches any characters between <code>a</code> and <code>b</code> (range)</td>
+</tr>
+</tbody>
+</table><h2>api</h2>
+
+<div class="highlight highlight-c"><pre><span class="c1">// create/free a regex environment.</span>
+<span class="k">struct</span> <span class="n">reg_env</span><span class="o">*</span> <span class="nf">reg_open_env</span><span class="p">();</span>
+<span class="kt">void</span> <span class="nf">reg_close_env</span><span class="p">(</span><span class="k">struct</span> <span class="n">reg_env</span><span class="o">*</span> <span class="n">env</span><span class="p">);</span>
+
+<span class="c1">// create/free a regex pattern.</span>
+<span class="k">struct</span> <span class="n">reg_pattern</span><span class="o">*</span> <span class="nf">reg_new_pattern</span><span class="p">(</span><span class="k">struct</span> <span class="n">reg_env</span><span class="o">*</span> <span class="n">env</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">rule</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">reg_free_pattern</span><span class="p">(</span><span class="k">struct</span> <span class="n">reg_pattern</span><span class="o">*</span> <span class="n">pattern</span><span class="p">);</span>
+
+<span class="c1">// match pattern, return a boolean value.</span>
+<span class="kt">int</span> <span class="nf">reg_match</span><span class="p">(</span><span class="k">struct</span> <span class="n">reg_pattern</span><span class="o">*</span> <span class="n">pattern</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">source</span><span class="p">,</span> <span class="kt">int</span> <span class="n">len</span><span class="p">);</span>
+</pre></div>
+
+<p>see <code>src/regex.h</code> headfile for detail.</p>
+
+<h2>example</h2>
+
+<div class="highlight highlight-c"><pre>  <span class="c1">// create env</span>
+  <span class="k">struct</span> <span class="n">reg_env</span><span class="o">*</span> <span class="n">env</span> <span class="o">=</span> <span class="n">reg_open_env</span><span class="p">();</span>
+
+  <span class="c1">// create pattern</span>
+  <span class="k">struct</span> <span class="n">reg_pattern</span><span class="o">*</span> <span class="n">pattern</span> <span class="o">=</span> <span class="n">reg_new_pattern</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">rule</span><span class="p">);</span>
+
+  <span class="c1">// match pattern</span>
+  <span class="kt">int</span> <span class="n">success</span> <span class="o">=</span> <span class="n">reg_match</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">source</span><span class="p">));</span>
+
+  <span class="c1">// free env</span>
+  <span class="n">reg_close_env</span><span class="p">(</span><span class="n">env</span><span class="p">);</span>
+</pre></div>
+
+<p>see <code>test/test_api.c</code> testcase for detail.</p></body></html>

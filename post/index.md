@@ -1,5 +1,5 @@
-## zixun的 blog
-  a rainbow coder. ;)
+## zixun's blog
+  a rainbow coder. mail:lvzixun@gmail.com  ;)
 
 
 
