@@ -2,3 +2,4 @@
 *.swap
 *.pyc
 *.html
+/post/index.md

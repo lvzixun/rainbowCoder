@@ -12,13 +12,15 @@ class PostDiff(object):
     return hcommit.hexsha
 
   def _remote_idiff(self):
-    local_hexsha = self._cur_local_hexsha()
-    self.origin.pull()
     hcommit = self.repo.head.commit
+    self.origin.pull()
+    local_hexsha = self._cur_local_hexsha()
     return hcommit.diff(local_hexsha)
 
   def _diff_(self, idiff, change_type):
     ret = []
+
+    print idiff, change_type
     for v in idiff.iter_change_type(change_type):
       file_name = None
       if v.a_blob:
@@ -38,7 +40,6 @@ class PostDiff(object):
     ret = []
     idiff = self._remote_idiff()
 
-    print(idiff)
     ret.extend(self._diff_(idiff, 'A')) # insert add file
     ret.extend(self._diff_(idiff, 'M')) # insert modify file
     return ret
