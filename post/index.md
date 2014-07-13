@@ -1,5 +1,5 @@
 ## zixun's blog
-  a rainbow coder. mail:lvzixun@gmail.com  ;)
+  a rainbow coder. ;) mail:lvzixun@gmail.com
 
 
 

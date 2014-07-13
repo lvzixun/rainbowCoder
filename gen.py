@@ -1,7 +1,11 @@
 import md
 import os
+import diff
+
 import json
 from datetime import datetime
+
+
 
 class GeneratedRainbowCoder(object):
   post_dir = './post'
@@ -10,6 +14,11 @@ class GeneratedRainbowCoder(object):
     handle = open('cfg.json', 'r')
     self.cfg = json.loads(handle.read())
     handle.close()
+    self.idiff = diff.PostDiff()
+
+  def _is_post(self, file_name):
+    pos = file_name.find('post/')
+    return pos == 0
 
   def _get_head_md(self):
     handle = open(self.cfg['head_md'], 'r')
@@ -106,9 +115,20 @@ class GeneratedRainbowCoder(object):
       self.gen_post(v['md_file'])
 
 
+  def building_update(self):
+    diff_list = self.idiff.diff_list()
 
-rainbow = GeneratedRainbowCoder()
-rainbow.building_all()
+    for v in diff_list:
+      file_name = v['file_name']
+      if self._is_post(file_name):
+        self.gen_post(file_name)
+
+    if len(diff_list) > 0:
+      self.building_index_md()
+
+
+# rainbow = GeneratedRainbowCoder()
+# rainbow.building_all()
 
 
 
