@@ -32,7 +32,7 @@ class TCPHandler(SocketServer.BaseRequestHandler):
     self.request.sendall(ret)
 
 if __name__ == "__main__":
-    HOST, PORT = "localhost", mgr.cfg['service_port']
+    HOST, PORT = mgr.cfg['service_address'], mgr.cfg['service_port']
     server = SocketServer.TCPServer((HOST, PORT), TCPHandler)
     server.serve_forever()
 
