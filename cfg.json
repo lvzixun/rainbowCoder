@@ -1,7 +1,5 @@
 {
   "css": "css/github.css",
   "head_md": "header.md",
-  "index_md": "post/index.md",
-  "service_address": "www.rainbowcoder.com",
-  "service_port": 9527
+  "index_md": "post/index.md"
 }
