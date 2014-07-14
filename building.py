@@ -3,6 +3,8 @@ import gen
 import mgr
 
 
+argv = sys.argv
+
 class Building(object):
   def __init__(self):
     self.rainbow = gen.GeneratedRainbowCoder()
@@ -13,6 +15,8 @@ class Building(object):
         lambda: self.rainbow.building_index_md(),
       "building_update": 
         lambda: self.rainbow.building_update(),
+      "building_post":
+        lambda: self.rainbow.gen_post(argv[2]),
     }
 
   def use_page(self):
@@ -32,7 +36,6 @@ class Building(object):
 
 building = Building()
 
-argv = sys.argv
 if len(argv) < 2:
   building.use_page()
 
