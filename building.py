@@ -16,7 +16,7 @@ class Building(object):
       "building_update": 
         lambda: self.rainbow.building_update(),
       "building_post":
-        lambda: self.rainbow.gen_post(argv[2]),
+        lambda: self.rainbow.building_post(argv[2]),
     }
 
   def use_page(self):

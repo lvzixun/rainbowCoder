@@ -112,6 +112,9 @@ class GeneratedRainbowCoder(object):
     for v in post_list:
       self.gen_post(v['md_file'])
 
+  def building_post(self, md_file):
+    self.building_index_md()
+    self.gen_post(md_file)
 
   def building_update(self):
     diff_list = self.idiff.diff_list()
