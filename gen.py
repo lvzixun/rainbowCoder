@@ -118,16 +118,13 @@ class GeneratedRainbowCoder(object):
 
   def building_update(self):
     diff_list = self.idiff.diff_list()
-    is_post = False
 
     for v in diff_list:
       file_name = v['file_name']
       if self._is_post(file_name):
         self.gen_post(file_name)
-        is_post = True
-
-    if is_post:
-      self.building_index_md()
+        
+    self.building_index_md()
 
 
 # rainbow = GeneratedRainbowCoder()
