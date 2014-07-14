@@ -2,4 +2,5 @@
 *.swap
 *.pyc
 *.html
+rc.sh
 /post/index.md
