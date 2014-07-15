@@ -1,10 +1,11 @@
 ## rainbowcoder
 
-折腾这么久，终于搞完了这个将markdown转换为html的blog了。Orz。
-好多东西之前也只是听说过，也没真正做过，这次折腾还是加了不少技能点。不过整个过程的乐趣还是挺多的，很开心。
+折腾这么久，终于搞完了这个将markdown转换为html的blog了。Orz。好多东西之前也只是听说过，也没真正做过，这次折腾还是加了不少技能点。不过整个过程的乐趣还是挺多的，很开心。
+
 -----
 
 blog的编写和发布主要是通过markdown文件，发布的流程大致如下：
+
 1. 在本地编写好要修改的markdown文本，之后使用`git commit`和`git push` 推送到[github](https://github.com/lvzixun/rainbowCoder)上去.
 2. [rainbowcoder](rainbowcoder.com)服务器上也会有一样的`git repository`, 将会把`github`上面的最新提交`git pull`下来，同时与当前的本地提交做diff，筛选出做过更改的markdown文件.
 3. 遍历`post`文件夹，重新生成`index.md`文件。与之前的diff出来的markdown文件通过`md.py`进行转换成对应的html。
