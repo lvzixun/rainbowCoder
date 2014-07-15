@@ -7,8 +7,11 @@
 blog的编写和发布主要是通过markdown文件，发布的流程大致如下：
 
 1. 在本地编写好要修改的markdown文本，之后使用`git commit`和`git push` 推送到[github](https://github.com/lvzixun/rainbowCoder)上去.
+
 2. [rainbowcoder](rainbowcoder.com)服务器上也会有一样的`git repository`, 将会把`github`上面的最新提交`git pull`下来，同时与当前的本地提交做diff，筛选出做过更改的markdown文件.
+
 3. 遍历`post`文件夹，重新生成`index.md`文件。与之前的diff出来的markdown文件通过`md.py`进行转换成对应的html。
+
 
 整个流程其实是有点蛋疼的，不如现有的blog框架实用。但，我初衷仅仅是想用markdown来写blog，一个个静态的html就能满足了，所以不想弄那么庞大的框架来实现这一简单的功能。所以就自己折腾了 ;)。
 
