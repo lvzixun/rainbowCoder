@@ -100,14 +100,12 @@ class GeneratedRainbowCoder(object):
 
   def building_index_md(self):
     post_list = self.get_post_list()
-    head = self._get_head_md() + '\n\n\n'
+    head = self._get_head_md() + u'\n\n\n'
     for v in post_list:
       head += self._format(v['title'], v['html_file'], v['create_date'])
     
     index_md = self.cfg['index_md']
     self._save_file(index_md, head)
-
-    exit()
     self.gen_post(index_md)
 
   def building_all(self):
