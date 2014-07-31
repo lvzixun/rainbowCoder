@@ -3,6 +3,7 @@ import os
 import diff
 import mgr
 import json
+import re
 from datetime import datetime
 
 
@@ -12,11 +13,17 @@ class GeneratedRainbowCoder(object):
 
   def __init__(self):
     self.cfg = mgr.cfg
+    self.pattern = re.compile('"?(post/.*\.md)"?')
     self.idiff = diff.PostDiff()
 
-  def _is_post(self, file_name):
-    pos = file_name.find('post/')
-    return pos == 0
+  def _get_post(self, file_name):
+    m = self.pattern.match(file_name)
+    if m:
+      name = m.groups()[0]
+      return name.decode('string_escape')
+    else:
+      return False
+
 
   def _get_head_md(self):
     handle = open(self.cfg['head_md'], 'r')
@@ -120,8 +127,8 @@ class GeneratedRainbowCoder(object):
     diff_list = self.idiff.diff_list()
 
     for v in diff_list:
-      file_name = v['file_name']
-      if self._is_post(file_name):
+      file_name = self._get_post(v['file_name'])
+      if file_name != False:
         self.gen_post(file_name)
         
     self.building_index_md()
