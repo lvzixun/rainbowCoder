@@ -127,9 +127,6 @@ class GeneratedRainbowCoder(object):
     self.building_index_md()
 
 
-rainbow = GeneratedRainbowCoder()
-rainbow.building_index_md()
-
 
 
 
