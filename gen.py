@@ -30,7 +30,7 @@ class GeneratedRainbowCoder(object):
 
   def _get_filename(self, path):
     base = os.path.basename(path)
-    return os.path.splitext(base)[0]
+    return os.path.splitext(base)[0].decode('UTF-8')
 
   def _get_file(self, file):
     handle = open(file, 'r')
@@ -94,8 +94,6 @@ class GeneratedRainbowCoder(object):
 
   def _format(self, title, html, date):
     # date = datetime.fromtimestamp(date).strftime('%Y-%m-%d %H:%M:%S')
-    title = title.decode('UTF-8')
-    html = html.decode('UTF-8')
     return '[%s](%s)\n' % (title, html)
 
   def building_index_md(self):
