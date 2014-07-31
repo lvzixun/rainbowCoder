@@ -94,6 +94,8 @@ class GeneratedRainbowCoder(object):
 
   def _format(self, title, html, date):
     # date = datetime.fromtimestamp(date).strftime('%Y-%m-%d %H:%M:%S')
+    title = title.decode('UTF-8')
+    html = html.decode('UTF-8')
     return '[%s](%s)\n' % (title, html)
 
   def building_index_md(self):
@@ -104,6 +106,8 @@ class GeneratedRainbowCoder(object):
     
     index_md = self.cfg['index_md']
     self._save_file(index_md, head)
+
+    exit()
     self.gen_post(index_md)
 
   def building_all(self):
@@ -127,8 +131,8 @@ class GeneratedRainbowCoder(object):
     self.building_index_md()
 
 
-# rainbow = GeneratedRainbowCoder()
-# rainbow.building_all()
+rainbow = GeneratedRainbowCoder()
+rainbow.building_index_md()
 
 
 
