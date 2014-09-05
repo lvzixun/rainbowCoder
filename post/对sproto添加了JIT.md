@@ -1,6 +1,6 @@
 ## 对sproto添加了JIT
 
-近期自己一直是在瞎折腾给云风之前写的[sproto](https://github.com/cloudwu/sproto)添加JIT  [sproto-JIT](https://github.com/lvzixun/sproto-JIT)。对协议解析添加JIT这个想法最早是来至于前年看到[upb](https://github.com/haberman/upb)的作者Heberman的一篇blog，他给他自己的upb项目尝试性的用[dynasm](http://corsix.github.io/dynasm-doc/index.html)添加了JIT，来用于进行协议的decode和encode。他仅仅是做了简单的尝试，其性能有50%+的提升：
+近期自己一直是在瞎折腾给云风之前写的[sproto](https://github.com/cloudwu/sproto)添加JIT  [sproto-JIT](https://github.com/lvzixun/sproto-JIT)。对协议解析添加JIT这个想法最早是来至于前年看到[upb](https://github.com/haberman/upb)的作者Heberman的一篇[blog](http://blog.reverberate.org/2011/04/upb-status-and-preliminary-performance.html)，他给他自己的upb项目尝试性的用[dynasm](http://corsix.github.io/dynasm-doc/index.html)添加了JIT，来用于进行协议的decode和encode。他仅仅是做了简单的尝试，其性能有50%+的提升：
 
 > Parsing an 80k protobuf into a data structure repeatedly,
 > calling Clear() between each parse.  (proto2 == Google protobuf)
