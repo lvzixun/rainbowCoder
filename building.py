@@ -1,6 +1,7 @@
 import sys
 import gen
 import mgr
+import os
 
 
 argv = sys.argv
@@ -17,6 +18,8 @@ class Building(object):
         lambda: self.rainbow.building_update(),
       "building_post":
         lambda: self.rainbow.building_post(argv[2]),
+      "building_rss":
+        lambda: os.system("lua rss.lua"),
     }
 
   def use_page(self):
