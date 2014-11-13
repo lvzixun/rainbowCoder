@@ -1,3 +1,4 @@
+import time
 import md
 import os
 import diff
@@ -60,9 +61,9 @@ class GeneratedRainbowCoder(object):
     return "html/" + title + ".html"
 
 
-  def get_html(self, md_file):
-    title = self._get_filename(md_file)
-    conv = md.MarkDownConvert(self._get_file(md_file))
+  def get_html(self, md_file, title=None, suffix=""):
+    title = title or self._get_filename(md_file)
+    conv = md.MarkDownConvert(self._get_file(md_file) + suffix)
 
     html =  u'<!DOCTYPE html>'
     html += '<html><head><meta charset="utf-8">'
@@ -74,9 +75,9 @@ class GeneratedRainbowCoder(object):
     html += "</html>"
     return html
 
-  def gen_post(self, md_file):
+  def _gen_post(self, md_file, title=None, suffix=""):
     print "building: " + md_file
-    html = self.get_html(md_file)
+    html = self.get_html(md_file, title, suffix)
     html_file = self._get_html_filename(md_file)
     self._save_file(html_file, html)
     return html_file
@@ -89,11 +90,14 @@ class GeneratedRainbowCoder(object):
       if os.path.isfile(md_file):
         title = self._get_filename(md_file)
         if title != 'index':
+          last_time = self.idiff.diff_last_time(md_file)
+          re_time = re.match("\s*(.*?)\s*\+", last_time).groups()[0]
+          struct_time = time.strptime(re_time)
           ret.append({
               'title': title,
               'md_file': md_file,
               'html_file': title + ".html",
-              'create_date': os.path.getctime(md_file),
+              'create_date':  struct_time,
             })
 
     ret.sort(key=lambda item: item['create_date'], reverse = True)
@@ -111,17 +115,24 @@ class GeneratedRainbowCoder(object):
     
     index_md = self.cfg['index_md']
     self._save_file(index_md, head)
-    self.gen_post(index_md)
+    self._gen_post(index_md, "rainbowCoder")
+
+
+  def _wrapper_post(self, md_file):
+    date = self.idiff.diff_last_time(md_file)
+    date = "\n-----\n" + date
+    print(date, md_file)
+    self._gen_post(md_file, suffix=date)
 
   def building_all(self):
     post_list = self.get_post_list()
     self.building_index_md()
     for v in post_list:
-      self.gen_post(v['md_file'])
+      self._wrapper_post(v['md_file'])
 
   def building_post(self, md_file):
     self.building_index_md()
-    self.gen_post(md_file)
+    self._wrapper_post(md_file)
 
   def building_update(self):
     diff_list = self.idiff.diff_list()
@@ -129,7 +140,7 @@ class GeneratedRainbowCoder(object):
     for v in diff_list:
       file_name = self._get_post(v['file_name'])
       if file_name != False:
-        self.gen_post(file_name)
+        self._wrapper_post(file_name)
         
     self.building_index_md()
 

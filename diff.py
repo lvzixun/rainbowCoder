@@ -1,3 +1,4 @@
+import re
 from git import *
 
 class PostDiff(object):
@@ -16,6 +17,16 @@ class PostDiff(object):
     self.origin.pull()
     local_hexsha = self._cur_local_hexsha()
     return hcommit.diff(local_hexsha)
+
+
+  def diff_last_time(self, md_file):
+    re_s = "^Date:(.*)$"
+    patt = re.compile(re_s)
+
+    log = self.repo.git.log(md_file)
+    date = re.search(re_s, log, re.M).group(0)
+    return patt.match(date).groups()[0]
+
 
   def _diff_(self, idiff, change_type):
     ret = []
