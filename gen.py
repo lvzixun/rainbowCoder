@@ -121,7 +121,6 @@ class GeneratedRainbowCoder(object):
   def _wrapper_post(self, md_file):
     date = self.idiff.diff_last_time(md_file)
     date = "\n-----\n" + date
-    print(date, md_file)
     self._gen_post(md_file, suffix=date)
 
   def building_all(self):
