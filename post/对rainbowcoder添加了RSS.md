@@ -7,3 +7,6 @@ google了一下RSS的工作流程，本来以为是一个很复杂的东西，�
 为什么不是用python，而是lua，主要原因是前段时间用lua刚实现过sprotodump，python实在是不熟悉，不太想折腾了。于是，为了快速实现，就用lua实现了。 Orz 
 
 这篇[RSS tutorial](https://www.mnot.net/rss/tutorial/) 写的很详细。当我写完之后，才发现python是有[rss.py](https://gist.github.com/mnot/221419)这个库的。而且实现的还很完善，看来，我又造了个蹩脚的轮子，不过整个过程还是玩的很开心，哈哈
+
+
+
