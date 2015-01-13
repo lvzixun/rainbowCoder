@@ -76,7 +76,7 @@ class GeneratedRainbowCoder(object):
     return "html/" + title + ".html"
 
 
-  def get_html(self, md_file, title=None, suffix=""):
+  def get_html(self, md_file, title=None, suffix="", has_disqus=False):
     title = title or self._get_filename(md_file)
     conv = md.MarkDownConvert(self._get_file(md_file) + suffix)
 
@@ -86,14 +86,15 @@ class GeneratedRainbowCoder(object):
     html += self._get_title(title)
     html += "</head><body>"
     html += conv.md2html().decode('UTF-8')
-    html += self.disqus
+    if has_disqus:
+      html += self.disqus
     html += "</body>"
     html += "</html>"
     return html
 
   def _gen_post(self, md_file, title=None, suffix=""):
     print "building: " + md_file
-    html = self.get_html(md_file, title, suffix)
+    html = self.get_html(md_file, title, suffix, True)
     html_file = self._get_html_filename(md_file)
     self._save_file(html_file, html)
     return html_file
