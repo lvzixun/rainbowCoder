@@ -92,7 +92,7 @@ class GeneratedRainbowCoder(object):
     html += "</html>"
     return html
 
-  def _gen_post(self, md_file, title=None, suffix="", has_disqus):
+  def _gen_post(self, md_file, title=None, suffix="", has_disqus=False):
     print "building: " + md_file
     html = self.get_html(md_file, title, suffix, has_disqus)
     html_file = self._get_html_filename(md_file)
