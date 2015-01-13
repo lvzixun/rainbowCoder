@@ -11,6 +11,21 @@ from datetime import datetime
 
 class GeneratedRainbowCoder(object):
   post_dir = './post'
+  disqus = '''
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'rainbowcoder'; // required: replace example with your forum shortname
+
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  '''
 
   def __init__(self):
     self.cfg = mgr.cfg
@@ -71,6 +86,7 @@ class GeneratedRainbowCoder(object):
     html += self._get_title(title)
     html += "</head><body>"
     html += conv.md2html().decode('UTF-8')
+    html += self.disqus
     html += "</body>"
     html += "</html>"
     return html
