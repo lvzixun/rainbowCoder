@@ -92,9 +92,9 @@ class GeneratedRainbowCoder(object):
     html += "</html>"
     return html
 
-  def _gen_post(self, md_file, title=None, suffix=""):
+  def _gen_post(self, md_file, title=None, suffix="", has_disqus):
     print "building: " + md_file
-    html = self.get_html(md_file, title, suffix, True)
+    html = self.get_html(md_file, title, suffix, has_disqus)
     html_file = self._get_html_filename(md_file)
     self._save_file(html_file, html)
     return html_file
@@ -138,7 +138,7 @@ class GeneratedRainbowCoder(object):
   def _wrapper_post(self, md_file):
     date = self.idiff.diff_last_time(md_file)
     date = "\n\n\n-----\n" + date
-    self._gen_post(md_file, suffix=date)
+    self._gen_post(md_file, suffix=date, has_disqus=True)
 
   def building_all(self):
     post_list = self.get_post_list()
