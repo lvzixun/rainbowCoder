@@ -113,15 +113,15 @@ class GeneratedRainbowCoder(object):
     for line in list_post:
       md_file = os.path.join(self.post_dir, line)
       if os.path.isfile(md_file):
-        title = self._get_filename(md_file)
-        if title != 'index':
+        filename = self._get_filename(md_file)
+        if filename != 'index':
           last_time = self.idiff.diff_last_time(md_file)
           re_time = re.match("\s*(.*?)\s*\+", last_time).groups()[0]
           struct_time = time.strptime(re_time)
           ret.append({
-              'title': title,
+              'title': self._get_mdtitle(md_file),
               'md_file': md_file,
-              'html_file': title + ".html",
+              'html_file': filename + ".html",
               'create_date':  struct_time,
             })
 
@@ -130,7 +130,7 @@ class GeneratedRainbowCoder(object):
 
   def _format(self, title, html, date):
     # date = datetime.fromtimestamp(date).strftime('%Y-%m-%d %H:%M:%S')
-    return '[%s](%s)\n' % (title, html)
+    return '[%s](%s)<br>\n' % (title, html)
 
   def building_index_md(self):
     post_list = self.get_post_list()
