@@ -75,9 +75,17 @@ class GeneratedRainbowCoder(object):
     title = self._get_filename(md_file)
     return "html/" + title + ".html"
 
+  def _get_mdtitle(self, md_file):
+    fd = open(md_file, "r")
+    l = fd.readline()
+    m = re.search("^\s*#+\s+(.+)$", l)
+    t = unicode(m.group(1), "utf-8")
+    fd.close()
+    return t
+
 
   def get_html(self, md_file, title=None, suffix="", has_disqus=False):
-    title = title or self._get_filename(md_file)
+    title = title or self._get_mdtitle(md_file)
     conv = md.MarkDownConvert(self._get_file(md_file) + suffix)
 
     html =  u'<!DOCTYPE html>'
