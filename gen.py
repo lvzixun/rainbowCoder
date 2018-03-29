@@ -130,7 +130,7 @@ class GeneratedRainbowCoder(object):
 
   def _format(self, title, html, date):
     # date = datetime.fromtimestamp(date).strftime('%Y-%m-%d %H:%M:%S')
-    return '[%s](%s)<br>\n' % (title, html)
+    return '[%s](%s)\n' % (title, html)
 
   def building_index_md(self):
     post_list = self.get_post_list()
