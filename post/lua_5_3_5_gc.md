@@ -43,10 +43,11 @@ static l_mem getdebt (global_State *g) {
 ~~~
 
 每次在执行gc step时都会判断GCdebt是否大于0，所以在下一次gc循环开启前，就必须要分配足够多的内存来将`GCdebt`变为大于0的值来触发下一轮的GC。
-
+通过`GCdebt` 这一个参数来控制gc的执行间歇率和步进倍率，我觉得这是很巧妙的设计。
 
 ----
 
+`luaC_step`函数是lua 默认gc的唯一入口，每次调用执行lua gc工作一步或者多步,函数实现如下： 
 ~~~.c
 
 /*
@@ -72,3 +73,55 @@ void luaC_step (lua_State *L) {
   }
 }
 ~~~
+
+### gc step
+
+lua gc 分为以下阶段:
+
+| 阶段顺序 | 阶段名称 | 阶段执行逻辑 | 是否可以分步执行 |
+|:---:|:----:|:------:|:----:|
+| 1 | GCSpause | gc暂停阶段 | yes |
+| 2 | GCSpropagate | gc标记传播阶段 | yes |
+| 3 | GCSatomic | 原子标记处理阶段 | no |
+| 4 | GCSswpallgc | 清理在`allgc`链表上面标记为white的对象 | yes |
+| 5 | GCSswpfinobj | 清理`finobj`链表上面标记为white的对象 | yes |
+| 6 | GCSswptobefnz | 清理`tobefnz`链表上面标记为white的对象 | yes |
+| 7 | GCSswpend | 结束清理阶段,准备进入调用gc元方法阶段 | - |
+| 8 | GCScallfin | 执行有`__gc`元方法的对象 | yes |
+
+整个阶段从1-8，除了`GCSatomic`阶段外，其他的阶段都是可以分步执行的。经过整个一个gc循环后，会再被设置为`GCSpause`状态，等待下一次的gc step。 每个阶段的执行都会返回一个工作执行了多少，表示当前singlestep执行了多少工作量，从而控制是否执行下一次的singlestep.
+~~~.c
+  do {  /* repeat until pause or enough "credit" (negative debt) */
+    lu_mem work = singlestep(L);  /* perform one single step */
+    debt -= work;
+  } while (debt > -GCSTEPSIZE && g->gcstate != GCSpause);
+~~~
+
+#### GCSpropagate
+
+`GCSpropagate`从root节点开始逐个mark对象，mark的过程就是在不停的遍历`gray`链表，拿到一个对象之后调用`propagatemark`函数，对不同的类型调用相应的`travers*`方法来进行mark调用`reallymarkobject`方法，不断的将对象标记成`gray`颜色，加入`gray`链表。对于一个table对象`{[1] = {}, [2] = {}}`当从其他对象标记到改table的时候，会将该对象标记为`gray`，同时加入`gray`链表中，之后经过下一次的`propagatemark`，将改table标记为`black`同时取出table1和table2放入`gray`链表中。之后继续遍历`gray`链表，直到
+链表里面不再有对象。 这个过程很像传播，所以取名叫`Spropagate`, 再此阶段对weaktable的对象做了一些处理。将`__mode='k'`的对象会放入`ephemeron`的链表中，`__mode='v'`的对象会放入`weak`链表。 `__mode='kv'`的对象会放入`allweak`链表中。之后等待在atomic阶段被处理。
+
+
+
+因为该阶段是可以分步执行，所以就会遇到之前已经标记为`black`的对象，再次被人修改，加入了新的pair对象。所以这里就需要处理标记，例如：对于已经标记成黑色的`t = {}`对象，设置`t.key = {}`
+时会调用`luaC_barrierback`将t标记为`gray`同时放入`grayagain`链表中，在atomic阶段再次被遍历标记。
+然而，对于`mt = {}; setmetatable(t, mt)`的行为，却调用的是`luaC_barrier`，将设置的mt对象标记`gray`，放入`gray`链表中等待下次被标记。
+
+----
+
+对于衡量标记阶段的工作量，是根据标记对象的真实大小来衡量的。 每次执行`singlestep`函数返回的`work`工作量是标记了多少对象的总内存(并非是真实的释放了`work`大小的内存)。`work`会反应到`dedt`上，来决定下一次的`singlestep`是不是要执行。
+
+
+#### GCSatomic
+
+原子阶段的实现在函数`static l_mem atomic (lua_State *L)`中，此阶段是不可分割的，不能分步处理。在atmoic阶段中会将会先执行`propagateall(g);`将vm中还未标记的对象全部标记。之后开始标记`grayagain`链表中的全部对象；之后遍历清理存储weak table的`ephemeron`, `allweak`, `weak`三个链表的key和value。 将当前不再存活但是拥有`__gc`方法的对象从`finobj`链表插入到`tobefnz`链表中，等待复活执行`__gc`元方法。 此阶段还有个细节是会执行`g->currentwhite = cast_byte(otherwhite(g));  /* flip current white */` 将当前的白色做flip，之所以用另外个值来标记white对象，是因为sweep阶段可以分步，有可能在sweep状态中，会执行创建一个新的对象挂接到`allgc`, 如果把这个对象标记成black，那就有可能再也没机会被变回white，所以此处加了一个新white来区分之前标记的white对象, 同时避免被清理。
+atomic阶段最后会调用`entersweep`函数，将`sweep`指针设置为`allgc`,进入sweep阶段。
+
+----
+因为此阶段是不能分步执行，所以在此阶段对gc卡顿的影响是最大。此阶段会遍历整个vm中所有的weak table，以及带有`__gc`元方法的对象。如果系统大量存在这两种对象的话， 会导致atomic工作量增加，从而造成像stop world那样的卡顿。
+此阶段的工作量，依然是根据标记对象的大小来衡量。
+
+
+#### GCSswpallgc, GCSswpfinobj, GCSswptobefnz
+这三个阶段是清理阶段，分别对应了清理链表`allgc`, `finobj`和`tobefnz`上面标记为当前white的对象。
