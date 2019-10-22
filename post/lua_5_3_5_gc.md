@@ -149,7 +149,7 @@ atomic阶段最后会调用`entersweep`函数，将`sweep`指针设置为`allgc`
 ----
 此阶段可以分步执行，每次`singlestep` 执行`GCSWEEPMAX`个对象，工作量是根据每个对象的估算值`GCSWEEPCOST`相乘的出，对于估算为什么不像mark阶段用对象的真实大小来衡量工作量, 此处有询问云风，给出的解释是:
 >1. mark 和 sweep 总要有一边去按内存数量来累加，这样才能匹配上分配的数字。
- 2. mark 需要访问的 gcobject 的数量 一定 少于 sweep 需要处理的 gcobject 数量。所以，让 sweep 跑的快一点比较好。
+>2. mark 需要访问的 gcobject 的数量 一定 少于 sweep 需要处理的 gcobject 数量。所以，让 sweep 跑的快一点比较好。
 
 mark一个对象，需要遍历这个对象的所有子对象，但是sweep阶段的free确不需要，相比来说用`GCSWEEPCOST`来衡量会更合适。
 

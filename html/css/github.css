@@ -455,6 +455,130 @@ body .task-list{
   background:#ffffff
 }
 
+.highlight .pl-c {
+  color: #6a737d;
+}
+
+.highlight .pl-c1,
+.highlight .pl-s .pl-v {
+  color: #005cc5;
+}
+
+.highlight .pl-e,
+.highlight .pl-en {
+  color: #6f42c1;
+}
+
+.highlight .pl-s .pl-s1,
+.highlight .pl-smi {
+  color: #24292e;
+}
+
+.highlight .pl-ent {
+  color: #22863a;
+}
+
+.highlight .pl-k {
+  color: #d73a49;
+}
+
+.highlight .pl-pds,
+.highlight .pl-s,
+.highlight .pl-s .pl-pse .pl-s1,
+.highlight .pl-sr,
+.highlight .pl-sr .pl-cce,
+.highlight .pl-sr .pl-sra,
+.highlight .pl-sr .pl-sre {
+  color: #032f62;
+}
+
+.highlight .pl-smw,
+.highlight .pl-v {
+  color: #e36209;
+}
+
+.highlight .pl-bu {
+  color: #b31d28;
+}
+
+.highlight .pl-ii {
+  background-color: #b31d28;
+  color: #fafbfc;
+}
+
+.highlight .pl-c2 {
+  background-color: #d73a49;
+  color: #fafbfc;
+}
+
+.highlight .pl-c2:before {
+  content: "^M";
+}
+
+.highlight .pl-sr .pl-cce {
+  color: #22863a;
+  font-weight: 700;
+}
+
+.highlight .pl-ml {
+  color: #735c0f;
+}
+
+.highlight .pl-mh,
+.highlight .pl-mh .pl-en,
+.highlight .pl-ms {
+  color: #005cc5;
+  font-weight: 700;
+}
+
+.highlight .pl-mi {
+  color: #24292e;
+  font-style: italic;
+}
+
+.highlight .pl-mb {
+  color: #24292e;
+  font-weight: 700;
+}
+
+.highlight .pl-md {
+  background-color: #ffeef0;
+  color: #b31d28;
+}
+
+.highlight .pl-mi1 {
+  background-color: #f0fff4;
+  color: #22863a;
+}
+
+.highlight .pl-mc {
+  background-color: #ffebda;
+  color: #e36209;
+}
+
+.highlight .pl-mi2 {
+  background-color: #005cc5;
+  color: #f6f8fa;
+}
+
+.highlight .pl-mdr {
+  color: #6f42c1;
+  font-weight: 700;
+}
+
+.highlight .pl-ba {
+  color: #586069;
+}
+
+.highlight .pl-sg {
+  color: #959da5;
+}
+
+.highlight .pl-corl {
+  color: #032f62;
+  text-decoration: underline;
+}
+
 .highlight .c{
   color:#999988;
   font-style:italic
