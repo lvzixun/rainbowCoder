@@ -9,5 +9,5 @@ git push
 
 
 echo "[rainbowcoder] post...."
-ssh zixun@www.rainbowcoder.com "cd ~/codes/rainbowCoder; python building.py building_update; python building.py building_rss;"
+ssh rainbowcoder "cd ~/codes/rainbowCoder; python building.py building_update; python building.py building_rss;"
 
