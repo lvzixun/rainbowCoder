@@ -14,9 +14,9 @@ class MarkDownConvert(object):
     }
 
   def md2html(self):
-    # s = self.data["text"]
-    # html = markdown2.markdown(s)
-    # return html.encode("utf-8")
-    params = json.dumps(self.data).encode("utf-8")
-    handle = urllib.urlopen("https://api.github.com/markdown", params)
-    return handle.read()
+    s = self.data["text"]
+    html = markdown2.markdown(s)
+    return html.encode("utf-8")
+    # params = json.dumps(self.data).encode("utf-8")
+    # handle = urllib.urlopen("https://api.github.com/markdown", params)
+    # return handle.read()
