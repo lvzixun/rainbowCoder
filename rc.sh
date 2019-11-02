@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "[git] add...."
-git add --all ~/codes/rainbowCoder/post
+git add --all post
 echo "[git] comit...."
 git ci -m "$(date) posting[by rainbowcoder]"
 echo "[git] push...."
