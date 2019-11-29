@@ -27,19 +27,12 @@ class GeneratedRainbowCoder(object):
   #   <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
   # '''
   disqus = '''
-    <div id="container"></div>
-    <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
-    <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
-    <script>
-    var gitment = new Gitment({
-      owner: 'lvzixun',
-      repo: 'rainbowCoder',
-      oauth: {
-        client_id: '2bc3c4c9e8370768c4e1',
-        client_secret: '5a85e9b6e138f66f6a45dae303bfdc071b15133c',
-      },
-    })
-    gitment.render('container')
+    <script src="https://utteranc.es/client.js"
+        repo="lvzixun/rainbowCoder"
+        issue-term="pathname"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
     </script>
   '''
 
