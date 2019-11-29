@@ -11,25 +11,41 @@ from datetime import datetime
 
 class GeneratedRainbowCoder(object):
   post_dir = './post'
-  disqus = '''
-    <div id="disqus_thread"></div>
-    <script type="text/javascript">
-      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-      var disqus_shortname = 'rainbowcoder'; // required: replace example with your forum shortname
+  # disqus = '''
+  #   <div id="disqus_thread"></div>
+  #   <script type="text/javascript">
+  #     /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  #     var disqus_shortname = 'rainbowcoder'; // required: replace example with your forum shortname
 
-      /* * * DON'T EDIT BELOW THIS LINE * * */
-      (function() {
-          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-      })();
+  #     /* * * DON'T EDIT BELOW THIS LINE * * */
+  #     (function() {
+  #         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  #         dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  #         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  #     })();
+  #   </script>
+  #   <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  # '''
+  disqus = '''
+    <div id="container"></div>
+    <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+    <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+    <script>
+    var gitment = new Gitment({
+      owner: 'lvzixun',
+      repo: 'https://github.com/lvzixun/rainbowCoder',
+      oauth: {
+        client_id: '2bc3c4c9e8370768c4e1',
+        client_secret: '5a85e9b6e138f66f6a45dae303bfdc071b15133c',
+      },
+    })
+    gitment.render('container')
     </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
   '''
 
   def __init__(self):
     self.cfg = mgr.cfg
-    self.pattern = re.compile('"?(post/.*\.md)"?')
+    self.pattern = re.compile(r'"?(post/.*\.md)"?')
     self.idiff = diff.PostDiff()
 
   def _get_post(self, file_name):
@@ -78,7 +94,7 @@ class GeneratedRainbowCoder(object):
   def _get_mdtitle(self, md_file):
     fd = open(md_file, "r")
     l = fd.readline()
-    m = re.search("^\s*#+\s+(.+)$", l)
+    m = re.search(r"^\s*#+\s+(.+)$", l)
     t = unicode(m.group(1), "utf-8")
     fd.close()
     return t
@@ -116,7 +132,7 @@ class GeneratedRainbowCoder(object):
         filename = self._get_filename(md_file)
         if filename != 'index':
           last_time = self.idiff.diff_last_time(md_file)
-          re_time = re.match("\s*(.*?)\s*\+", last_time).groups()[0]
+          re_time = re.match(r"\s*(.*?)\s*\+", last_time).groups()[0]
           struct_time = time.strptime(re_time)
           ret.append({
               'title': self._get_mdtitle(md_file),
