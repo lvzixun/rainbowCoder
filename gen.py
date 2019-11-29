@@ -33,7 +33,7 @@ class GeneratedRainbowCoder(object):
     <script>
     var gitment = new Gitment({
       owner: 'lvzixun',
-      repo: 'https://github.com/lvzixun/rainbowCoder',
+      repo: 'rainbowCoder',
       oauth: {
         client_id: '2bc3c4c9e8370768c4e1',
         client_secret: '5a85e9b6e138f66f6a45dae303bfdc071b15133c',
