@@ -1,4 +1,4 @@
-## ELF执行文件本地函数打印
+## 获取static函数名称
 
 前段时间有同事把我之前写的[luaprofile](https://github.com/lvzixun/luaprofile)工具集成到公司内部基于skynet的通用游戏服务器上面，额外加了火焰图功能，需要帮忙review下代码。
 简单来说火焰图就是整个系统每隔一段时间对系统的一个函数调用栈的snapshot集合。他在实现获取函数调用栈是直接遍历[call_frame](https://github.com/lvzixun/luaprofile/blob/master/profile.c#L37-L49)这个struct来实现的，但是因为`call_frame`这个链表只是记录的是从调用`start`开始之后的调用栈，并不是完备的。 
