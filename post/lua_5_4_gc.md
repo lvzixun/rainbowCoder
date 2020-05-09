@@ -3,6 +3,7 @@
 近期因为lua5.4 更新了rc1，同时云风将其合并到了skynet的master上面，所以花时间了解了下新版本的gc实现。于是着手写一篇blog记录了下，这两天对lua分代gc的了解。
 相比于之前的5.3的分步gc实现，在5.4多了新的分代gc。而且这两种gc工作模式可以通过`lua_gc`api来进行相互切换。
 在之前的[这篇blog](https://rainbowcoder.com/lua_5_3_5_gc.html)中有详细记录之前5.3分步gc的实现，再次不在多说，主要记录下新增的分代gc的实现。
+
 -----
 
 原来在`GCObject`中的用来标记当前颜色和状态的`marked`的低3个bit用来存储对象的age值。在分代gc模式下，所有的对象都会对应一个age值，来表示当前对象已经存活的时间和状态。
@@ -69,7 +70,11 @@ static void genstep (lua_State *L, global_State *g) {
 #define G_TOUCHED2  6   /* old object touched in previous cycle */
 ~~~
 
-对于一个正常的对象，在经历了多次的gc循环之后会从`G_NEW` -> `G_SURVIVAL` -> `G_OLD1` -> `G_OLD`。
+对于一个正常的对象，在经历了多次的gc循环之后会经过 如下状态的转换:
+```
+G_NEW -> G_SURVIVAL -> G_OLD1 -> G_OLD
+```
+
 
 
 
