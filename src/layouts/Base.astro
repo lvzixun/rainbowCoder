@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import '../styles/geek.css';
+import BrandMark from '../components/BrandMark.astro';
 import Icon from '../components/Icon.astro';
 import { site, withBase, stripBase } from '../lib/site.mjs';
 interface Props { title?: string; description?: string; article?: boolean; date?: string; updated?: string }
@@ -32,19 +32,19 @@ const path = stripBase(Astro.url.pathname);
     {updated && <meta property="article:modified_time" content={updated} />}
     <script is:inline>
       try {
-        const saved = localStorage.getItem('rainbowcoder-theme');
-        document.documentElement.dataset.theme = saved === 'light' ? 'light' : 'dark';
-      } catch { document.documentElement.dataset.theme = 'dark'; }
+        const saved = localStorage.getItem('rainbowcoder-paper-theme');
+        document.documentElement.dataset.theme = saved === 'dark' ? 'dark' : 'light';
+      } catch { document.documentElement.dataset.theme = 'light'; }
     </script>
   </head>
   <body>
     <a href="#main" class="skip-link">跳到正文</a>
     <header class="site-header shell">
-      <a class="brand" href={withBase('/')} aria-label="rainbowCoder 首页"><span class="brand-code" aria-hidden="true">&lt;/&gt;</span><span>rainbow<span class="brand-light">Coder</span><span class="brand-period">_</span></span></a>
+      <a class="brand" href={withBase('/')} aria-label="rainbowCoder 首页"><span class="brand-mark"><BrandMark /></span><span>rainbowCoder<span class="brand-period">.</span></span></a>
       <nav class="site-nav" aria-label="主导航">
-        <a href={withBase('/')} aria-current={path === '/' ? 'page' : undefined}><span class="nav-prefix" aria-hidden="true">01</span>文章</a>
-        <a href={withBase('/archive/')} aria-current={path.startsWith('/archive') ? 'page' : undefined}><span class="nav-prefix" aria-hidden="true">02</span>归档</a>
-        <a href={withBase('/about/')} aria-current={path.startsWith('/about') ? 'page' : undefined}><span class="nav-prefix" aria-hidden="true">03</span>关于</a>
+        <a href={withBase('/')} aria-current={path === '/' ? 'page' : undefined}>文章</a>
+        <a href={withBase('/archive/')} aria-current={path.startsWith('/archive') ? 'page' : undefined}>归档</a>
+        <a href={withBase('/about/')} aria-current={path.startsWith('/about') ? 'page' : undefined}>关于</a>
       </nav>
       <div class="header-tools">
         <a class="icon-button social-link" href={site.github} aria-label="zixun 的 GitHub" target="_blank" rel="noopener noreferrer"><Icon name="github" /></a>
@@ -53,7 +53,7 @@ const path = stripBase(Astro.url.pathname);
     </header>
     <main id="main" class="shell" tabindex="-1"><slot /></main>
     <footer class="site-footer shell">
-      <span><span class="footer-prompt" aria-hidden="true">λ</span> © {new Date().getFullYear()} zixun<span class="footer-separator">/</span>rainbowCoder</span>
+      <span>© {new Date().getFullYear()} zixun<span class="footer-separator">/</span>rainbowCoder</span>
       <div><a href={site.repository} target="_blank" rel="noopener noreferrer">源码</a><a href={withBase('/rainbowcoder_rss.xml')}><Icon name="rss" size={15} /> RSS</a><a href={`mailto:${site.email}`}>联系</a></div>
     </footer>
     <script>
@@ -63,7 +63,7 @@ const path = stripBase(Astro.url.pathname);
       toggle?.addEventListener('click', () => {
         const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
         document.documentElement.dataset.theme = theme;
-        try { localStorage.setItem('rainbowcoder-theme', theme); } catch {}
+        try { localStorage.setItem('rainbowcoder-paper-theme', theme); } catch {}
         updateLabel();
       });
     </script>

@@ -1,6 +1,6 @@
 # rainbowCoder
 
-zixun 的个人技术博客。Astro 构建，文章保存在 `post/`，发布为静态网站。默认深色编辑器风格，支持浅色主题、搜索、主题筛选和代码复制。
+zixun 的个人技术博客。Astro 构建，文章保存在 `post/`，发布为静态网站。默认暖白纸感与陶土色的阅读风格，搭配衬线标题和手绘标记；支持深色主题、搜索、主题筛选和代码复制。
 
 站点：<https://lvzixun.github.io/rainbowCoder/>
 

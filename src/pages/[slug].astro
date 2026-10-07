@@ -25,7 +25,7 @@ const jsonLd = {
     <article class="article-content">
       <a href={withBase('/')} class="back-link">全部文章</a>
       <header class="article-header">
-        <p class="article-path"><span>~/post</span> / {post.slug}.md</p>
+        <p class="eyebrow article-eyebrow">随笔 / {post.tags[0] || '技术'}</p>
         <h1>{post.title}</h1>
         <div class="post-meta"><span>zixun</span><span class="meta-dot">·</span><time datetime={post.date}>{displayDate(post.date)}</time><span class="meta-dot">·</span><span>{post.minutes} 分钟阅读</span>{post.updated && <><span class="meta-dot">·</span><span>更新于 <time datetime={post.updated}>{displayDate(post.updated)}</time></span></>}</div>
         <p class="article-description">{post.description}</p>
