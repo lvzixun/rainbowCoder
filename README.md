@@ -2,7 +2,7 @@
 
 zixun 的个人技术博客。Astro 构建，文章保存在 `post/`，发布为静态网站。
 
-站点：<https://rainbowcoder-zixun.giving-chub-5343.chatgpt.site>
+站点：<https://rainbowcoder-zixun.lvzixun.chatgpt.site>
 
 ## 本地开发
 

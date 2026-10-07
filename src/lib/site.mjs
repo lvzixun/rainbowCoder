@@ -1,4 +1,4 @@
-export const siteUrl = process.env.SITE_URL || 'https://rainbowcoder-zixun.giving-chub-5343.chatgpt.site';
+export const siteUrl = process.env.SITE_URL || 'https://rainbowcoder-zixun.lvzixun.chatgpt.site';
 export const site = {
   title: 'rainbowCoder',
   author: 'zixun',
