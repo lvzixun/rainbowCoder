@@ -1,5 +1,13 @@
 .DS_Store
 *.swap
 *.pyc
-*.html
-/post/index.md
+node_modules/
+dist/
+.astro/
+.sites-runtime/
+.sites-checkout/
+.env
+.env.*
+!.env.example
+test-results/
+playwright-report/

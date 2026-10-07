@@ -1,0 +1,61 @@
+---
+import Base from '../layouts/Base.astro';
+import PostList from '../components/PostList.astro';
+import Icon from '../components/Icon.astro';
+import { posts, tags } from '../lib/posts';
+---
+<Base>
+  <section class="intro">
+    <p class="eyebrow"><span class="tiny-rule"></span>ZIXUN’S NOTEBOOK</p>
+    <h1>关于代码的<span class="intro-break"><br /></span><span class="intro-emphasis">一些记录。</span></h1>
+    <p class="intro-description">写过的代码，读过的实现，还有值得记下的思考。<br />关于 Lua、编译器与游戏服务端。</p>
+    <div class="intro-bottom"><span>始于 2014<span class="meta-dot">·</span>{posts.length} 篇笔记</span><a href="/rainbowcoder_rss.xml"><Icon name="rss" size={16} /> 订阅更新</a></div>
+  </section>
+  <div class="home-grid">
+    <section class="articles-section" aria-label="文章列表">
+      <div class="section-heading"><h2>全部文章<span id="result-count">{posts.length}</span></h2><span class="section-note">按时间倒序</span></div>
+      <div class="mobile-filter"><label for="tag-select" class="sr-only">按主题筛选</label><select id="tag-select"><option value="">全部主题</option>{tags.map(tag => <option value={tag}>{tag}</option>)}</select></div>
+      <PostList items={posts} filterable />
+      <p class="no-results" hidden>没有找到相关文章。试试其他关键词，或<button id="reset-search" type="button">清除筛选</button>。</p>
+      <p id="search-announcement" class="sr-only" aria-live="polite"></p>
+      <p class="list-end">写到这里，下次继续。<span aria-hidden="true">✳</span></p>
+    </section>
+    <aside class="home-sidebar">
+      <div class="sidebar-sticky">
+        <div class="search-box"><Icon name="search" size={17} /><label for="search" class="sr-only">搜索文章</label><input id="search" type="search" placeholder="搜索文章…" autocomplete="off" /></div>
+        <div class="topic-filter"><h2 class="sidebar-heading">主题</h2><div class="topic-buttons"><button type="button" class="active" data-filter="" aria-pressed="true"><span>全部文章</span><span>{posts.length}</span></button>{tags.map(tag => <button type="button" data-filter={tag} aria-pressed="false"><span>{tag}</span><span>{posts.filter(p => p.tags.includes(tag)).length}</span></button>)}</div></div>
+        <div class="sidebar-note"><span class="note-symbol" aria-hidden="true">{ '{ }' }</span><p>保持好奇，<br />慢慢把事情想明白。</p><a href="/about/">关于 zixun</a></div>
+      </div>
+    </aside>
+  </div>
+  <script>
+    const input = document.querySelector<HTMLInputElement>('#search')!;
+    const select = document.querySelector<HTMLSelectElement>('#tag-select')!;
+    const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+    const rows = [...document.querySelectorAll<HTMLElement>('[data-post]')];
+    let selected = '';
+    const filter = () => {
+      const query = input.value.trim().toLowerCase();
+      let count = 0;
+      for (const row of rows) {
+        const match = (!selected || JSON.parse(row.dataset.tags!).includes(selected)) && (!query || row.dataset.search!.includes(query));
+        row.hidden = !match;
+        if (match) count++;
+      }
+      buttons.forEach(button => {
+        const active = button.dataset.filter === selected;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', String(active));
+      });
+      select.value = selected;
+      document.querySelector('#result-count')!.textContent = String(count);
+      document.querySelector<HTMLElement>('.no-results')!.hidden = count > 0;
+      document.querySelector<HTMLElement>('.list-end')!.hidden = count === 0;
+      document.querySelector('#search-announcement')!.textContent = `找到 ${count} 篇文章`;
+    };
+    input.addEventListener('input', filter);
+    buttons.forEach(button => button.addEventListener('click', () => { selected = button.dataset.filter!; filter(); }));
+    select.addEventListener('change', () => { selected = select.value; filter(); });
+    document.querySelector('#reset-search')?.addEventListener('click', () => { input.value = ''; selected = ''; filter(); input.focus(); });
+  </script>
+</Base>

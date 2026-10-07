@@ -1,4 +1,10 @@
-## lua5.3.5 gc实现
+---
+title: "Lua 5.3.5 GC 实现"
+date: 2019-10-17
+updated: 2019-10-22
+description: "阅读 Lua 垃圾回收源码，梳理三色标记、增量回收、弱引用与各阶段的实现。"
+tags: ["Lua", "GC"]
+---
 
 之前对lua的gc实现只是了解个大概，多数是在遇到问题的时候看特定的gc代码。对于细节实现并没有花时间认真查看，最近由于工作上的一些原因需要协助其他童鞋对gc做一定的优化，所以决定花时间认真阅读了lua 5.3.5版本的gc实现，感觉还是收获挺多的，之前不了解的地方也豁然开朗了，对lua 整个gc的工作流程又熟悉了几分。 
 于是就想把之前丢掉的blog给从新拿起来，记录下自己这两天的一些收获和见解。 ;D
@@ -7,7 +13,7 @@
 
 所有脱离了语言特性和应用环境而去谈论gc的实现和方法都是在耍流氓。gc是对语言内部对象的管理；语言特性不同，选择的策略不同。虽然同样都是用标记清除，但是实现的复杂度和难度确相差甚远。对于lua gc来说因为`weak table`,`__gc`元方法还有分步的策略选择，让简单的标记回收的实现复杂度上升好几个数量级。
 
-### 标记回收
+## 标记回收
 lua使用的是mark-sweep(标记回收)的方式来实现gc的。 对于整个系统中被gc管理的对象有: `proto`,`closure`, `table`,`coroutine`, `userdata`, `string`(分为`short string`和`long string`)。这些对象在被创建的那一时刻会被link到全局唯一`struct global_State`中的`allgc`这个链表上面。 
 GC整个过程简单来说：首先是mark阶段，mark时会从整个state的root节点开始遍历标记。每个对象被标记时会有三种状态, `white`, `black`和`gray`:
 
@@ -21,7 +27,7 @@ GC整个过程简单来说：首先是mark阶段，mark时会从整个state的ro
 
 ----
 对于默认的lua gc是通过分配内存来进行驱动gc的工作。 当在整个lua vm中没有内存产生分配，自然gc也不会进行工作。 当有内存分配时，对于gc一次step工作量的多少是根据在`struct global_State`中`GCdebt`(债务)来决定的。 lua的每次内存分配和释放都是通过`void *luaM_realloc_ (lua_State *L, void *block, size_t osize, size_t nsize)` 这个函数来实现，在`luaM_realloc_`函数中每次内存的变化都会加到`GCdebt`上面: 
-~~~.c
+~~~c
 g->GCdebt = (g->GCdebt + nsize) - realosize;
 ~~~
 `GCdebt`的多少决定了调用一次`luaC_step`所做的gc工作量。 对GC速度和间隔的控制，全部都是通过`GCdebt`的大小来实现的。 
@@ -29,7 +35,7 @@ g->GCdebt = (g->GCdebt + nsize) - realosize;
 
 当调用lua函数`collectgrabage` ["setstepmul"](https://www.lua.org/manual/5.3/manual.html#pdf-collectgarbage)设置只是`global_State`中的`gcstepmul`，作用是把当前的`GCdebt`乘以`gcstepmul`这个系数，将债务放大(在函数`static l_mem getdebt (global_State *g)`中实现)；
 
-~~~.c
+~~~c
 /*
 ** get GC debt and convert it from Kb to 'work units' (avoid zero debt
 ** and overflows)
@@ -48,7 +54,7 @@ static l_mem getdebt (global_State *g) {
 
 ["setpause"](https://www.lua.org/manual/5.3/manual.html#pdf-collectgarbage)设置的也只是`gcpause`字段，当每次GC执行完一轮的时候，会统计出当前系统中还剩多少内存，之后乘以`gcpause`这个系数(默认200)，将`GCdebt`设置成`debt = gettotalbytes(g) - threshold;`根据默认系数这个值多数为`-threshold/2`；因为所有触发gc是在对象创建时主动调用`luaC_condGC`来触发的。 
 
-~~~.c
+~~~c
 #define luaC_condGC(L,pre,pos) \
 	{ if (G(L)->GCdebt > 0) { pre; luaC_step(L); pos;}; \
 	  condchangemem(L,pre,pos); }
@@ -60,8 +66,7 @@ static l_mem getdebt (global_State *g) {
 ----
 
 `luaC_step`函数是lua 默认gc的唯一入口，每次调用执行lua gc工作至少一步，函数实现如下： 
-~~~.c
-
+~~~c
 /*
 ** performs a basic GC step when collector is running
 */
@@ -86,7 +91,7 @@ void luaC_step (lua_State *L) {
 }
 ~~~
 
-### gc step
+## gc step
 
 lua gc 分为以下阶段:
 
@@ -102,14 +107,14 @@ lua gc 分为以下阶段:
 | 8 | GCScallfin | 执行有`__gc`元方法的对象 | yes |
 
 整个阶段从1-8，除了`GCSatomic`阶段外，其他的阶段都是可以分步执行的。经过整个一个gc循环后，会再被设置为`GCSpause`状态，等待下一次的gc step。 每个阶段的执行都会返回一个工作执行了多少，表示当前`singlestep`执行了多少工作量，从而控制是否执行下一次的`singlestep`。
-~~~.c
+~~~c
   do {  /* repeat until pause or enough "credit" (negative debt) */
     lu_mem work = singlestep(L);  /* perform one single step */
     debt -= work;
   } while (debt > -GCSTEPSIZE && g->gcstate != GCSpause);
 ~~~
 
-#### GCSpropagate
+### GCSpropagate
 
 `GCSpropagate`从root节点开始逐个mark对象，mark的过程就是在不停的遍历`gray`链表，拿到一个对象之后调用`propagatemark`函数，对不同的类型调用相应的`travers*`方法来进行mark：不断的将对象标记成`gray`颜色，加入`gray`链表。
 
@@ -125,7 +130,7 @@ lua gc 分为以下阶段:
 对于衡量标记阶段的工作量，是根据标记对象的真实大小来衡量的。 每次执行`singlestep`函数返回的`work`工作量是标记了多少对象的总内存(并非是真实的释放了`work`大小的内存)。`work`会反应到`dedt`上，来决定下一次的`singlestep`是不是要执行。
 
 
-#### GCSatomic
+### GCSatomic
 
 原子阶段的实现在函数`static l_mem atomic (lua_State *L)`中，此阶段是不可分割的，不能分步处理。处理流程如下：
 
@@ -141,7 +146,7 @@ atomic阶段最后会调用`entersweep`函数，将`sweep`指针设置为`allgc`
 此阶段的工作量，依然是根据标记对象的大小来衡量。
 
 
-#### GCSswpallgc, GCSswpfinobj, GCSswptobefnz和GCSswpend
+### GCSswpallgc, GCSswpfinobj, GCSswptobefnz和GCSswpend
 前三个阶段是清理阶段，分别对应了清理链表`allgc`, `finobj`和`tobefnz`上面标记为`当前white`的对象。清理的过程也很简单，就是遍历链表上面的对象，是`otherwhite`才会被清理掉(因为在atomic阶段已经将`currentwhite`做了flip)，其他颜色的对象会设置成`white`，等待下一次gc循环的标记处理。
 
 由于lua对short string做了intern处理。同样的short string在vm中只会存在唯一的一个string对象，所有的short string都被放在`stringtable strt;`这个hash表中。所以在GCSswpend阶段会resize strt。
@@ -154,10 +159,10 @@ atomic阶段最后会调用`entersweep`函数，将`sweep`指针设置为`allgc`
 mark一个对象，需要遍历这个对象的所有子对象，但是sweep阶段的free确不需要，相比来说用`GCSWEEPCOST`来衡量会更合适。
 
 
-#### GCScallfin 
+### GCScallfin
 这个阶段是遍历`tobefnz`链表，执行被复活的对象 `__gc`元方法，每执行完一个对象，就把改对象打上`FINALIZEDBIT`标记，表示已经执行过`__gc`元方法，避免此对象如果被`__gc`元方法中复活再失去引用时被重复调用`__gc`元方法；同时把对象从`tobefnz`链表移除，插入到`allgc`链表中，等待下次gc被清理。
 此阶段是可以被分步执行，每一次的工作量是有`gcfinnum`字段来控制。跟sweep阶段固定每次都清理`GCSWEEPMAX`个对象不同，`gcfinnum`的增长是每次都翻倍的。实现代码如下:
-~~~.c
+~~~c
 /*
 ** call a few (up to 'g->gcfinnum') finalizers
 */
@@ -177,7 +182,7 @@ static int runafewfinalizers (lua_State *L) {
 所有带有`__gc`元方法的对象，都会被保留到下一次gc循环才会被真正回收。GCScallfin阶段的工作量与sweep一致，都是用估算的对象大小`GCFINALIZECOST`来衡量。 当`tobefnz`链表为空，则表示GCScallfin阶段结束，同时切换状态到最初的GCSpause阶段，进入下一次的gc循环。
 
 
-### `global_State`中的`GCObject`链表
+## `global_State`中的`GCObject`链表
 lua vm中的`GCObject`对象，当前时刻只会存在以下链表中的其中一个。
 
 * 1 `allgc`  每创建一个新的`GCObject`对象，都会被挂接到`allgc`上面，记录了全部被gc管理的对象。

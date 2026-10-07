@@ -1,9 +1,14 @@
-## lua-5.4.2 stacksize产生的bug
+---
+title: "Lua 5.4.2 stacksize 产生的 bug"
+date: 2020-11-12
+description: "一次元方法返回 nil 的排查：追踪 Lua 栈大小调整与尾调用之间的问题。"
+tags: ["Lua"]
+---
 
 上周[杰涛童鞋](https://github.com/t0350)遇到一个很奇怪的问题：在特定情况下元表重载`__add`运算符会导致返回结果为`nil`, 经过漫长的定位和排查之后发现是skynet用的lua内部产生的bug。Orz
  因为skynet master分支用的[lua](https://github.com/lua/lua)很新，是lua5.4.2。这个版本还没有发布release，roberto最新的提交也是在半个月前。知道原因后，可以构造如下的简单测试用例复现:
 
-~~~.lua
+~~~lua
 local t = {}
 setmetatable(t, t)
 function t.__add(a, b)
@@ -42,7 +47,7 @@ local c= t+2
 print(c) -- nil，expect 2
 ~~~
 出现此bug的原因是，每个`lua_State`在进行分配`stack`的时候，都会额外分配`EXTRA_STACK`长度的slot，这些slot是专为元方法使用的额外空间，减少元方法在触发时还要检查`stack`是否grow。在触发元方法时会调用`luaT_callTMres`函数，这个函数的实现如下:
-~~~.c
+~~~c
 void luaT_callTMres (lua_State *L, const TValue *f, const TValue *p1,
                      const TValue *p2, StkId res) {
   ptrdiff_t result = savestack(L, res);
@@ -62,14 +67,14 @@ void luaT_callTMres (lua_State *L, const TValue *f, const TValue *p1,
 ~~~
 在调用之初会对func元方法填充参数，这里并没有判断`stack`是否足够，因为假设了`stack`必然会有`EXTRA_STACK`长度的空间供填充数据。因此这里`top`是有可能超过`stack_last`；
 之后再通过`luaD_call`函数去调用注册的元方法。问题是出现元方法触发时会有可能触发`luaD_reallocstack`对现有的`stack`进行grow，`reallocstack`时并没有对`EXTRA_STACK`中的值做判断。直接做了设置成`nil`。
-~~~.c
+~~~c
  for (; lim < newsize; lim++)
     setnilvalue(s2v(newstack + lim)); /* erase new segment */
 ~~~
 
 因此在`luaT_callTMres`时push参数时，刚好将参数push到了`EXTRA_STACK`中，同时又触发了`reallocstack` 会导致之前设置的参数变成`nil`。这也是为啥上面的测试用例会返回`nil`的原因。因此fix这个问题比较简单，就是在`reallocstack`时跳过`EXTRA_STACK`长度来进行设置`nil`。但是仔细想下当`lua_State`被第一次创建出来时，调用的是`stack_init`函数，此处也并没有将`EXTRA_STACK`中的值做初始化，因此有可能在第一次触发`reallocstack`时会导致之前的`EXTRA_STACK`段会是未初始化的`value`，如果有直接拿着值用的情况下会造成访问一块未初始化的内存，导致crash。所以需要在`stack_init`中也对`EXTRA_STACK`部分设置成`nil`。于是针对这个bug的fix如下:
 
-~~~.diff
+~~~diff
 diff --git a/ldo.c b/ldo.c
 index a60972b2..4b55c31c 100644
 --- a/ldo.c

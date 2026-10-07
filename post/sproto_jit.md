@@ -1,4 +1,10 @@
-## 对sproto添加了JIT
+---
+title: "为 sproto 添加 JIT"
+date: 2014-09-05
+updated: 2018-03-29
+description: "尝试用 DynASM 为 sproto 协议解析生成机器码，记录实现思路与性能表现。"
+tags: ["Lua", "性能优化"]
+---
 
 近期自己一直是在瞎折腾给云风之前写的[sproto](https://github.com/cloudwu/sproto)添加JIT  [sproto-JIT](https://github.com/lvzixun/sproto-JIT)。对协议解析添加JIT这个想法最早是来至于前年看到[upb](https://github.com/haberman/upb)的作者Heberman的一篇[blog](http://blog.reverberate.org/2011/04/upb-status-and-preliminary-performance.html)，他给他自己的upb项目尝试性的用[dynasm](http://corsix.github.io/dynasm-doc/index.html)添加了JIT，来用于进行协议的decode和encode。他仅仅是做了简单的尝试，其性能有50%+的提升：
 
@@ -19,12 +25,12 @@
 
 当看到[sproto](https://github.com/cloudwu/sproto)之后，如果像Heberman的ubp那样，也使用dynasm添加JIT的话，根据之前添加JIT的经验来看在性能上应该也会有不错的提升。抱着这样简单的想法，花了1，2周的断断续续时间给添加了inline threading的优化。但测试的结果很不理想，在最好状态下仅仅是有14%+的性能提升。:(
 
-### spro-JIT
+## spro-JIT
 
 其主要工作是在`import_type`生成`struct sproto_type`对象的时候，生成对协议数据encode/decode的代码。
 `struct sproto_type`的定义如下:
 
-~~~.c
+~~~c
 struct sproto_type {
   const char * name;
   int n;
@@ -39,7 +45,7 @@ struct sproto_type {
 
 其中`decode_func`和`encode_func`既为JIT生成的encode/decode代码。对于之前的解释执行:
 
-~~~.c
+~~~c
     switch(type) {
       case SPROTO_TSTRING: {
         sz = encode_string(cb, ud, f, data, size);
@@ -78,14 +84,14 @@ struct sproto_type {
 `encode_func`则为反之。`decode_xxxx`是生成的解析`xxx`类型的机器码，根据proto的定义按照field进行生成。由于运行时能够知道对应的proto的每个定义，所以在之前的decode中的`findtag`的开销也能省去。对于cpu来说，只需要顺着生成的机器码去执行就行了。但是由于sproto是通过callback的方式来进行填充数据和解析数据的，在真正运行时，callback的开销本身就占到了60%+。如果不去改sproto对lua的绑定代码的话，性能不会有太大的提升。然而我还是倾向于保证sproto库的完整性，不想去修改API和协议数据格式。这就导致了添加JIT本身对使用callback机制的sproto很难有质上的提升。:(
 
 
-### 对比
+## 对比
 
 A2和upb使用inline threading这样的简单方式就能够有很高的性能提升，跟其测试用例也是有一定关系。A2的测试用例是对5000个数据进行选择排序。JIT对进行排序操作的prototype生成了机器码，整个性能测试仅仅一次进入生成的机器码进行执行，upb也是对一个很大message的数据进行做测试。
 
 于此不同的是sproto的测试是对一个简单的proto做100M次的测试。生成的机器码同时也被调用了100M次。而且sproto本身支持的类型和proto-buffer比起来少很多。
 
 
-### 可能的优化
+## 可能的优化
 
 对于proto本身还可以进行一个可以尝试的优化，就是对有嵌套定义的proto进行展开encode/decode，对于如下proto：
 ```
@@ -110,7 +116,7 @@ A2和upb使用inline threading这样的简单方式就能够有很高的性能�
 ```
 这样会减少一次encode的调用，从而提升性能。 这个优化已经打算要加到TODO LIST中了。 ;)
 
-### PS
+## PS
 在[readme](https://github.com/lvzixun/sproto-JIT/blob/master/README.md)上的测试用例中，我故意将proto的tag写的比较乱，增加了原来的sprot在解释过程中findtag的开销，从而与sproto-JIT相比，让其能够看起来有更高的性能，XD。 所以我才在readme里面说道是最好有14%+的提升， 哈哈
 
 

@@ -1,4 +1,10 @@
-## AOI
+---
+title: "AOI：从事件通知到快照差异"
+date: 2019-11-03
+updated: 2019-11-05
+description: "重新思考 AOI 的更新方式，用快照与差异计算减少重复通知和性能开销。"
+tags: ["游戏服务端", "性能优化"]
+---
 
 对于AOI(area if interest)介绍的文章实在是太多了，比如常用的灯塔，9grid，十字链表等等，这些本质上是在面对海量的数据量做裁枝。最近同事聊起来说在做AOI优化部分的工作，于是就感兴趣跟他聊起来现在的实现，以及优化的方向。 其实现在的实现就是最最标准和简单的9 grid的实现。 每次对象在`add`, `move`, `delete`时，会返回一个集合，表示需要通知的其他对象。 当如果N个对象全部都是在同一个grid里面而且同时产生事件，那这个简单的算法会是O(NxN)的性能开销。 
 
@@ -10,11 +16,11 @@
 其实对于snapshot本身只是为了diff，那其实可以在grid上记录下两次`update`之间的改动，在`update`时直接根据改动来生成diff列表，之后再把改动合并到grid存储objects的集合中就好，这样就避免对整个grid的snapshot。 
 所以我就实现了 [AOI](https://github.com/lvzixun/aoi)来证明了想法。 ;D
 
-### AOI 内部实现
+## AOI 内部实现
 首先你可以通过`aoi.aoi_new(map_row, map_col, grid_row, grid_col)`来构建一个`aoi_obj`，`aoi_obj:aoi_add(obj_id, marked, pos_x, pos_y)`接口来向aoi 场景中添加一个对象id为`obj_id`的object，所有的object可以是watcher，maker，或者同时为两者。 只有watcher才会收到maker产生的事件，watcher之间不会产生任何事件。 `aoi_obj:aoi_remove(obj_id)
 `函数为移除一个对象, `aoi_obj:aoi_set(obj_id, pos_x, pos_y)`更新一个对象，以及`aoi_obj:aoi_update()`更新整个aoi对象，返回需要通知的watchers的makers事件。 事件分为三类`D`删除，`A`添加，`U`更新。 每个对象的更新会根据`grid_row`和`grid_col`被存储在对应的grid对象上。 `grid_obj`的定义如下：
 
-~~~.lua
+~~~lua
     local obj = {
         aoi_obj = aoi_obj,
         grid_idx = grid_idx,
@@ -34,6 +40,6 @@
 最终我在自己机器`Intel(R) Core(TM) i7-4578U CPU @ 3.00GHz`上面测试了在同一个grid添加10K个对象，仅仅只需要0.028496s. 
 
 
-### 订阅通知
+## 订阅通知
 其实对于服务器来说，aoi的工作并不只是只能完全放到服务器来做。根据灯塔算法，将整个world划分成等大的grid，客户端自己计算统计那些grid需要订阅（关心），那些grid应该取消订阅。服务器对于每个grid定时同步订阅的watcher数据。
 服务器的工作就会变得很简单，维护一系列grid上面订阅的对象，同时把grid上产生的事件通知给对应的订阅者即可。 客户端当进入新的grid，会产生订阅协议，服务器将整个grid的状态同步过去。取消订阅时，客户端将在对应的grid的对象自己移除，同时服务器也不会通知相应grid的事件。驱动全部都是通过客户端来发起， 这样服务器所做的工作就只是同步订阅的grid数据这一个简单的事情，也很容易通过多个服务做横向扩展。 对于slg来说，我觉得这是个比较好的aoi方案。

@@ -1,4 +1,10 @@
-## sublimeText的clang插件
+---
+title: "Sublime Text 的 Clang 补全插件"
+date: 2015-01-13
+updated: 2018-03-29
+description: "为 Sublime Text 实现 Clang 自动补全，从 libclang 接口到插件的实践记录。"
+tags: ["编译器", "工具"]
+---
 
 发现我现在越来越懒了，当时一时的兴趣弄出来的blog，本打算好好记录自己做过的一些有意思的事情。但发现搞完之后却各种懒得去写blog记录~~ Orz
 
@@ -16,5 +22,5 @@
 整个项目大部分都耗费在对sublimeText的插件实现上，主要是因为第一次写sublimeText的插件，而且还想支持sublimeText 2/3，但结果发现sublimeText2/3分别用的是python2.X和python3.X。Orz
 最后想来想去还是放弃对2的支持，只对3做了支持。这段时间踩的坑还是蛮多的，不过最后还是用起来了。添加了自动补全，语法诊断，以及标示符跳转。最初想要的功能都有了，而且跟之前的sublimeClang这个插件一样的精准。哈哈
 
-### preview
-<img src="http://ww4.sinaimg.cn/large/7608d17fgw1eo4dgrggc0g20da0bi44p.gif" width="50%" />
+## preview
+![Clang 自动补全演示](/images/clang-complete.gif)

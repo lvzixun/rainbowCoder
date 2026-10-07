@@ -1,0 +1,8 @@
+---
+import Base from '../../layouts/Base.astro';
+import { posts, years } from '../../lib/posts';
+---
+<Base title="归档">
+  <header class="page-header"><p class="eyebrow"><span class="tiny-rule"></span>ARCHIVE</p><h1>时间里的笔记。</h1><p>{posts.length} 篇文章，从 2014 年写起。</p></header>
+  <div class="archive">{years.map(year => <section class="archive-year"><h2>{year}</h2><ul>{posts.filter(post => post.date.startsWith(year)).map(post => <li><a href={post.href}><time datetime={post.date}>{post.date.slice(5).replace('-', '.')}</time><span>{post.title}</span></a></li>)}</ul></section>)}</div>
+</Base>

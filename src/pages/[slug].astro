@@ -1,0 +1,111 @@
+---
+import Base from '../layouts/Base.astro';
+import { posts, displayDate } from '../lib/posts';
+import { site } from '../lib/site.mjs';
+export function getStaticPaths() {
+  return posts.map((post, index) => ({ params: { slug: post.slug }, props: { post, index } }));
+}
+const { post, index } = Astro.props;
+const Content = post.Content;
+const headings = post.headings.filter(heading => heading.depth >= 2 && heading.depth <= 4);
+const newer = posts[index - 1];
+const older = posts[index + 1];
+const jsonLd = {
+  '@context': 'https://schema.org', '@type': 'BlogPosting',
+  headline: post.title, description: post.description,
+  datePublished: post.date, dateModified: post.updated || post.date,
+  author: { '@type': 'Person', name: site.author, url: site.github },
+  mainEntityOfPage: new URL(post.href, Astro.site).href,
+  inLanguage: 'zh-CN',
+};
+---
+<Base title={post.title} description={post.description} article date={post.date} updated={post.updated}>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd).replace(/</g, '\\u003c')} />
+  <div class="article-layout">
+    <article class="article-content">
+      <a href="/" class="back-link">全部文章</a>
+      <header class="article-header">
+        <h1>{post.title}</h1>
+        <div class="post-meta"><span>zixun</span><span class="meta-dot">·</span><time datetime={post.date}>{displayDate(post.date)}</time><span class="meta-dot">·</span><span>{post.minutes} 分钟阅读</span>{post.updated && <><span class="meta-dot">·</span><span>更新于 <time datetime={post.updated}>{displayDate(post.updated)}</time></span></>}</div>
+        <p class="article-description">{post.description}</p>
+        <div class="post-tags">{post.tags.map(tag => <span>{tag}</span>)}</div>
+      </header>
+      {headings.length > 0 && <details class="mobile-toc"><summary>文章目录</summary><nav aria-label="文章目录">{headings.map(heading => <a class:list={{ 'toc-sub': heading.depth > 2 }} href={`#${heading.slug}`}>{heading.text}</a>)}</nav></details>}
+      <div class="prose"><Content /></div>
+      <div class="article-end">感谢阅读。<a href={`https://github.com/lvzixun/rainbowCoder/blob/master/post/${post.slug}.md`} target="_blank" rel="noopener noreferrer">在 GitHub 查看原文</a></div>
+      <nav class="article-pagination" aria-label="相邻文章">
+        {newer ? <a href={newer.href}><span>较新一篇</span><strong>{newer.title}</strong></a> : <div />}
+        {older && <a href={older.href}><span>较早一篇</span><strong>{older.title}</strong></a>}
+      </nav>
+      <section class="comments" aria-label="评论">
+        <h2>交流与讨论</h2>
+        <p>使用 GitHub 账号参与讨论。评论由 Utterances 提供，也可以前往 <a href="https://github.com/lvzixun/rainbowCoder/issues" class="text-link" target="_blank" rel="noopener noreferrer">GitHub Issues</a>。</p>
+        <button id="load-comments" type="button" data-issue={post.href}>加载评论</button>
+        <p class="comments-status" id="comments-status" role="status" hidden></p>
+        <div id="comments-container"></div>
+      </section>
+    </article>
+    {headings.length > 0 && <aside class="article-toc"><div class="toc-sticky"><h2>本文目录</h2><nav aria-label="本文目录">{headings.map(heading => <a class:list={{ 'toc-sub': heading.depth > 2 }} href={`#${heading.slug}`}>{heading.text}</a>)}</nav></div></aside>}
+  </div>
+  <script>
+    document.querySelectorAll<HTMLPreElement>('.prose pre').forEach((pre, index) => {
+      pre.tabIndex = 0;
+      pre.setAttribute('aria-label', `代码示例 ${index + 1}`);
+      const wrapper = document.createElement('div');
+      wrapper.className = 'code-container';
+      pre.before(wrapper);
+      wrapper.append(pre);
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'copy-button';
+      button.textContent = '复制';
+      button.setAttribute('aria-label', `复制代码示例 ${index + 1}`);
+      button.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(pre.querySelector('code')?.textContent || pre.textContent || '');
+          button.textContent = '已复制';
+          setTimeout(() => { button.textContent = '复制'; }, 1800);
+        } catch { button.textContent = '请选中复制'; }
+      });
+      wrapper.append(button);
+    });
+    document.querySelectorAll<HTMLImageElement>('.prose img').forEach(img => { img.loading = 'lazy'; img.decoding = 'async'; });
+    const links = [...document.querySelectorAll<HTMLAnchorElement>('.article-toc nav a')];
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) links.forEach(link => link.classList.toggle('active', decodeURIComponent(link.hash.slice(1)) === entry.target.id));
+        });
+      }, { rootMargin: '-5% 0px -65% 0px' });
+      document.querySelectorAll('.prose h2, .prose h3, .prose h4').forEach(heading => observer.observe(heading));
+    }
+    const loadComments = document.querySelector<HTMLButtonElement>('#load-comments')!;
+    const status = document.querySelector<HTMLElement>('#comments-status')!;
+    loadComments.addEventListener('click', () => {
+      loadComments.disabled = true;
+      status.hidden = false;
+      status.textContent = '正在连接评论服务…';
+      const script = document.createElement('script');
+      script.src = 'https://utteranc.es/client.js';
+      script.setAttribute('repo', 'lvzixun/rainbowCoder');
+      script.setAttribute('issue-term', loadComments.dataset.issue!);
+      script.setAttribute('theme', document.documentElement.dataset.theme === 'dark' ? 'github-dark' : 'github-light');
+      script.setAttribute('crossorigin', 'anonymous');
+      script.async = true;
+      const timer = setTimeout(() => { status.textContent = '如果评论未能显示，可以在 GitHub 仓库的 Issues 中参与讨论。'; }, 12000);
+      script.addEventListener('error', () => { clearTimeout(timer); status.textContent = '评论服务暂时无法连接，请稍后再试，或前往 GitHub Issues。'; loadComments.disabled = false; });
+      const listener = (event: MessageEvent) => {
+        if (event.origin !== 'https://utteranc.es') return;
+        clearTimeout(timer);
+        status.hidden = true;
+        loadComments.hidden = true;
+        window.removeEventListener('message', listener);
+      };
+      window.addEventListener('message', listener);
+      document.querySelector('#comments-container')!.replaceChildren(script);
+    });
+    new MutationObserver(() => {
+      document.querySelector<HTMLIFrameElement>('.utterances-frame')?.contentWindow?.postMessage({ type: 'set-theme', theme: document.documentElement.dataset.theme === 'dark' ? 'github-dark' : 'github-light' }, 'https://utteranc.es');
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  </script>
+</Base>

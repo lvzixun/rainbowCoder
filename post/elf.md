@@ -1,11 +1,16 @@
-## 获取static函数名称
+---
+title: "获取 static 函数名称"
+date: 2019-12-19
+description: "从 Lua 调用栈和火焰图出发，通过 ELF 符号表查找 static 函数的名称。"
+tags: ["工具", "Lua"]
+---
 
 前段时间有同事把我之前写的[luaprofile](https://github.com/lvzixun/luaprofile)工具集成到公司内部基于skynet的通用游戏服务器上面，额外加了火焰图功能，需要帮忙review下代码。
 简单来说火焰图就是每隔一段时间对系统的函数调用栈的snapshot集合。他在实现获取函数调用栈是直接遍历[call_frame](https://github.com/lvzixun/luaprofile/blob/master/profile.c#L37-L49)这个struct来实现的，但是因为`call_frame`这个链表只是记录的是从调用`start`开始之后的调用栈，并不是完备的。 
 
 -----
 所以最好是遍历lua vm的`callinfo`链表来获取调用栈，所以就顺手写了个在lua5.3.5遍历vm获取调用栈的代码:
-~~~.c
+~~~c
 #include "lstate.h"
 #include "lobject.h"
 static int
@@ -54,7 +59,7 @@ ldump_callinfo(lua_State* L) {
 `so`或者`.out`这些elf文件，找到`.symtab`中所在的位置，读取对应的函数偏移量来定位名称。最后我实现了[elfaddr](https://gist.github.com/lvzixun/70fc46816e6b67b50d330e11578b58d8) 这个函数能够查询`static `函数。;D
 
 输出效果如下:
-~~~.c
+~~~c
 [11] <CF>C_function_address:0x1067c9160file:/codes/skynet/luaclib/skynet.so name:ldump_callinfo
 [10] <L>@./test/ts2.lua:15
 [9] <L>@./test/ts2.lua:17

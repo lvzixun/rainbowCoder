@@ -1,0 +1,24 @@
+---
+import Base from '../../layouts/Base.astro';
+import { site } from '../../lib/site.mjs';
+---
+<Base title="关于">
+  <header class="page-header"><p class="eyebrow"><span class="tiny-rule"></span>ABOUT</p><h1>你好，我是 zixun。</h1><p>A rainbow coder. ;)</p></header>
+  <div class="about-layout">
+    <div class="prose">
+      <p class="about-lead">把写过的代码、读过的源码，<br />和琢磨过的问题留在这里。</p>
+      <p>rainbowCoder 从 2014 年开始。这里记录了一些关于 Lua、编译器、协议解析和游戏服务端的探索：有从头实现一个正则引擎的尝试，也有阅读垃圾回收源码、排查问题的过程。</p>
+      <p>文章里的实现和结论属于写下它们时的版本。比起给出最终答案，我更希望留下理解一个问题的过程。</p>
+      <h2>一些做过的东西</h2>
+      <ul>
+        <li><a href="https://github.com/lvzixun/regex">regex</a>：一个简单的正则表达式引擎。</li>
+        <li><a href="https://github.com/lvzixun/sproto-JIT">sproto-JIT</a>：为 sproto 协议解析添加 JIT。</li>
+        <li><a href="https://github.com/lvzixun/clang-complete">clang-complete</a>：基于 Clang 的 Sublime Text 补全插件。</li>
+        <li><a href="https://github.com/lvzixun/zxml">zxml</a>：一个零拷贝的 XML 解析器。</li>
+      </ul>
+      <h2>关于这个博客</h2>
+      <p>文章用 Markdown 编写，源码保存在 GitHub。如果发现错误，欢迎通过邮件或文章下的评论交流。</p>
+    </div>
+    <aside class="about-links"><h2>保持联系</h2><a href={site.github}>GitHub / lvzixun</a><a href={`mailto:${site.email}`}>发一封邮件</a><a href="/rainbowcoder_rss.xml">RSS 订阅</a></aside>
+  </div>
+</Base>
