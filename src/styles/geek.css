@@ -10,7 +10,6 @@
   --accent-soft: #e0f3eb;
   --code-bg: #f2f5fa;
   --purple: #7154b5;
-  --number: #a34d15;
   --panel: #ffffff;
 }
 :root[data-theme='dark'] {
@@ -24,7 +23,6 @@
   --accent-soft: #152e2a;
   --code-bg: #111923;
   --purple: #b8a5f6;
-  --number: #efb583;
   --panel: #101822;
 }
 .shell { width: min(1160px, calc(100% - 96px)); }
@@ -35,7 +33,7 @@
 .site-nav a > span { font: .7rem var(--mono); color: var(--accent); margin-right: 7px; }
 .site-nav a[aria-current]::after { width: 100%; left: 0; height: 1px; }
 .icon-button { border-radius: 6px; }
-.intro { display: grid; grid-template-columns: minmax(0, 1fr) 390px; gap: 36px 64px; align-items: center; padding: 60px 0 26px; }
+.intro { padding: 48px 0 26px; }
 .intro::before { content: ''; position: absolute; inset: 0; z-index: -1; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 28px 28px; opacity: .14; mask-image: linear-gradient(110deg, transparent 30%, #000); }
 .terminal-prompt { gap: 9px; flex-wrap: wrap; font-size: .72rem; letter-spacing: 0; margin-bottom: 23px; color: var(--accent); }
 .prompt-path { color: var(--purple); }
@@ -46,21 +44,7 @@
 .hero-cursor { font-family: var(--mono); font-weight: 400; color: var(--accent); margin-left: 2px; }
 .intro-description { font-size: .94rem; margin-bottom: 18px; }
 .intro-comment { font: .75rem/1.7 var(--mono); color: var(--muted); margin-bottom: 0; }
-.terminal-card { border: 1px solid var(--line); border-radius: 10px; background: var(--panel); box-shadow: 0 16px 50px #0000000c; overflow: hidden; transform: rotate(-1deg); }
-.terminal-toolbar { height: 43px; display: flex; align-items: center; gap: 17px; padding: 0 15px; background: var(--subtle); border-bottom: 1px solid var(--line); font: .7rem var(--mono); color: var(--muted); }
-.window-dots { display: flex; gap: 6px; }
-.window-dots i { display: block; width: 8px; height: 8px; border-radius: 50%; background: #e78883; }
-.window-dots i:nth-child(2) { background: #dbba73; }
-.window-dots i:nth-child(3) { background: #76b798; }
-.terminal-filetype { margin-left: auto; font-size: .63rem; }
-.terminal-code { padding: 17px 0; font: .82rem/1.9 var(--mono); }
-.terminal-code > div { display: flex; white-space: pre; }
-.terminal-lineno { width: 46px; flex: none; text-align: right; padding-right: 18px; color: var(--muted); font-size: .72rem; user-select: none; opacity: .7; }
-.syntax-key { color: var(--purple); }
-.syntax-string { color: var(--accent); }
-.syntax-number { color: var(--number); }
-.terminal-status { display: flex; justify-content: space-between; padding: 7px 15px; border-top: 1px solid var(--line); color: var(--muted); font: .64rem var(--mono); }
-.intro-bottom { grid-column: 1 / -1; padding-top: 12px; font-size: .76rem; }
+.intro-bottom { margin-top: 28px; padding-top: 12px; font-size: .76rem; }
 .home-grid { gap: 64px; grid-template-columns: minmax(0, 1fr) 218px; padding-top: 34px; }
 .section-heading { padding-bottom: 10px; border-bottom: 1px solid var(--line); }
 .section-heading h2 { font-size: .86rem; font-weight: 500; }
@@ -99,16 +83,12 @@
 .toc-sticky h2 { font: .72rem var(--mono); }
 .about-links { border-top-color: var(--accent); }
 @media (max-width: 1000px) {
-  .intro { grid-template-columns: minmax(0, 1fr) 340px; gap: 30px; }
-  .terminal-code { font-size: .75rem; }
   .home-grid { gap: 38px; }
 }
 @media (max-width: 900px) {
   .shell { width: calc(100% - 64px); }
-  .intro { grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; }
   .intro h1 { font-size: 2.4rem; }
   .terminal-prompt { font-size: .67rem; }
-  .terminal-code { font-size: .7rem; }
   .home-grid { grid-template-columns: minmax(0, 1fr) 185px; }
 }
 @media (max-width: 680px) {
@@ -118,13 +98,12 @@
   .brand-code { font-size: .8rem; padding: 1px 4px; }
   .site-nav { gap: 14px; font-size: .78rem; }
   .site-nav a > span { display: none; }
-  .intro { display: block; padding: 36px 0 23px; }
-  .terminal-card { display: none; }
+  .intro { padding: 36px 0 23px; }
   .terminal-prompt { gap: 7px; font-size: .66rem; margin-bottom: 19px; }
   .intro h1 { font-size: 2.5rem; }
   .intro-description { font-size: .86rem; }
   .intro-comment { font-size: .67rem; margin-bottom: 20px; }
-  .intro-bottom { font-size: .7rem; padding-top: 4px; }
+  .intro-bottom { margin-top: 0; font-size: .7rem; padding-top: 4px; }
   .home-grid { display: flex; gap: 23px; padding-top: 23px; }
   .section-heading h2 .section-path { margin-right: 11px; font-size: .72rem; }
   .post-item { grid-template-columns: 22px minmax(0, 1fr); gap: 8px; padding: 24px 0; }
