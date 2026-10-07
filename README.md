@@ -1,8 +1,8 @@
 # rainbowCoder
 
-zixun 的个人技术博客。Astro 构建，文章保存在 `post/`，发布为静态网站。
+zixun 的个人技术博客。Astro 构建，文章保存在 `post/`，发布为静态网站。默认深色编辑器风格，支持浅色主题、搜索、主题筛选和代码复制。
 
-站点：<https://rainbowcoder-zixun.lvzixun.chatgpt.site>
+站点：<https://lvzixun.github.io/rainbowCoder/>
 
 ## 本地开发
 
@@ -19,7 +19,7 @@ npm run preview    # 预览构建产物
 
 ## 写文章
 
-在 `post/` 新建 Markdown，文件名即文章地址，如 `lua.md` 对应 `/lua.html`。
+在 `post/` 新建 Markdown，文件名即文章地址，如 `lua.md` 对应 `/rainbowCoder/lua.html`。
 
 ```markdown
 ---
@@ -45,13 +45,13 @@ tags: [Lua]
 - `src/lib/`：内容读取与公共配置。
 - `public/`：静态资源。
 - `scripts/`：迁移与构建产物检查。
-- `.openai/hosting.json`：Sites 托管配置。
+- `.github/workflows/pages.yml`：GitHub Pages 自动发布。
 
 ## 发布
 
-当前使用 Sites 托管。更新源码后，可让支持 Sites 的助手检查、构建并重新发布；也可将 `dist/` 发布到其他静态托管平台。`SITE_URL` 环境变量可覆盖生产站点地址。
+正式站点使用免费的 GitHub Pages。仓库 Settings → Pages → Source 选择 **GitHub Actions**（已开通）。推送到 `master` 后，`Publish blog` 工作流自动执行检查、构建、链接验证并发布；Actions 页面可查看部署状态。Pull Request 和其他分支运行构建检查。
 
-GitHub Actions 在提交和 Pull Request 中执行检查、构建与链接验证。GitHub 源码推送不会自动更新 Sites；部署由 Sites 发布流程完成。
+默认站点地址为 `https://lvzixun.github.io/rainbowCoder/`，站内链接、图片、RSS 与 sitemap 自动带上 `/rainbowCoder/`。写 Markdown 时继续使用 `/images/example.png` 等根路径，构建会补全站点前缀。修改托管地址时同步修改发布工作流的 `SITE_URL`；本地也可用该环境变量覆盖地址。
 
 ## 历史迁移
 

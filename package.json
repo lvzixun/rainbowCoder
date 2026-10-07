@@ -3,7 +3,9 @@
   "version": "2.0.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22.12.0" },
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "dev": "astro dev --host 0.0.0.0",
     "check": "astro check",
@@ -12,9 +14,10 @@
     "preview": "astro preview --host 0.0.0.0"
   },
   "dependencies": {
-    "astro": "7.3.6",
+    "@astrojs/markdown-satteri": "0.4.3",
     "@astrojs/rss": "4.0.19",
-    "@astrojs/sitemap": "3.7.4"
+    "@astrojs/sitemap": "3.7.4",
+    "astro": "7.3.6"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",

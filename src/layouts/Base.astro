@@ -1,12 +1,13 @@
 ---
 import '../styles/global.css';
+import '../styles/geek.css';
 import Icon from '../components/Icon.astro';
-import { site } from '../lib/site.mjs';
+import { site, withBase, stripBase } from '../lib/site.mjs';
 interface Props { title?: string; description?: string; article?: boolean; date?: string; updated?: string }
 const { title, description = site.description, article = false, date, updated } = Astro.props;
 const pageTitle = title ? `${title} · ${site.title}` : `${site.title} · zixun 的技术笔记`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
-const path = Astro.url.pathname;
+const path = stripBase(Astro.url.pathname);
 ---
 <!doctype html>
 <html lang="zh-CN">
@@ -17,9 +18,9 @@ const path = Astro.url.pathname;
     <meta name="author" content={site.author} />
     <meta name="color-scheme" content="light dark" />
     <title>{pageTitle}</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
     <link rel="canonical" href={canonical} />
-    <link rel="alternate" type="application/rss+xml" title="rainbowCoder RSS" href="/rainbowcoder_rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title="rainbowCoder RSS" href={withBase('/rainbowcoder_rss.xml')} />
     <meta property="og:type" content={article ? 'article' : 'website'} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
@@ -32,18 +33,18 @@ const path = Astro.url.pathname;
     <script is:inline>
       try {
         const saved = localStorage.getItem('rainbowcoder-theme');
-        document.documentElement.dataset.theme = saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      } catch { document.documentElement.dataset.theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+        document.documentElement.dataset.theme = saved === 'light' ? 'light' : 'dark';
+      } catch { document.documentElement.dataset.theme = 'dark'; }
     </script>
   </head>
   <body>
     <a href="#main" class="skip-link">跳到正文</a>
     <header class="site-header shell">
-      <a class="brand" href="/" aria-label="rainbowCoder 首页"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>rainbow<span class="brand-light">Coder</span><span class="brand-period">.</span></span></a>
+      <a class="brand" href={withBase('/')} aria-label="rainbowCoder 首页"><span class="brand-code" aria-hidden="true">&lt;/&gt;</span><span>rainbow<span class="brand-light">Coder</span><span class="brand-period">_</span></span></a>
       <nav class="site-nav" aria-label="主导航">
-        <a href="/" aria-current={path === '/' ? 'page' : undefined}>文章</a>
-        <a href="/archive/" aria-current={path.startsWith('/archive') ? 'page' : undefined}>归档</a>
-        <a href="/about/" aria-current={path.startsWith('/about') ? 'page' : undefined}>关于</a>
+        <a href={withBase('/')} aria-current={path === '/' ? 'page' : undefined}><span class="nav-prefix" aria-hidden="true">01</span>文章</a>
+        <a href={withBase('/archive/')} aria-current={path.startsWith('/archive') ? 'page' : undefined}><span class="nav-prefix" aria-hidden="true">02</span>归档</a>
+        <a href={withBase('/about/')} aria-current={path.startsWith('/about') ? 'page' : undefined}><span class="nav-prefix" aria-hidden="true">03</span>关于</a>
       </nav>
       <div class="header-tools">
         <a class="icon-button social-link" href={site.github} aria-label="zixun 的 GitHub" target="_blank" rel="noopener noreferrer"><Icon name="github" /></a>
@@ -52,8 +53,8 @@ const path = Astro.url.pathname;
     </header>
     <main id="main" class="shell" tabindex="-1"><slot /></main>
     <footer class="site-footer shell">
-      <span>© {new Date().getFullYear()} zixun<span class="footer-separator">/</span>rainbowCoder</span>
-      <div><a href={site.repository} target="_blank" rel="noopener noreferrer">源码</a><a href="/rainbowcoder_rss.xml"><Icon name="rss" size={15} /> RSS</a><a href={`mailto:${site.email}`}>联系</a></div>
+      <span><span class="footer-prompt" aria-hidden="true">λ</span> © {new Date().getFullYear()} zixun<span class="footer-separator">/</span>rainbowCoder</span>
+      <div><a href={site.repository} target="_blank" rel="noopener noreferrer">源码</a><a href={withBase('/rainbowcoder_rss.xml')}><Icon name="rss" size={15} /> RSS</a><a href={`mailto:${site.email}`}>联系</a></div>
     </footer>
     <script>
       const toggle = document.querySelector<HTMLButtonElement>('.theme-toggle');
@@ -63,11 +64,6 @@ const path = Astro.url.pathname;
         const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
         document.documentElement.dataset.theme = theme;
         try { localStorage.setItem('rainbowcoder-theme', theme); } catch {}
-        updateLabel();
-      });
-      matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-        try { if (localStorage.getItem('rainbowcoder-theme')) return; } catch {}
-        document.documentElement.dataset.theme = event.matches ? 'dark' : 'light';
         updateLabel();
       });
     </script>

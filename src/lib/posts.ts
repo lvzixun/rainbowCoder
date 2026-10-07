@@ -1,4 +1,5 @@
 import type { MarkdownInstance } from 'astro';
+import { withBase } from './site.mjs';
 
 export interface Frontmatter {
   title: string;
@@ -28,7 +29,7 @@ export const posts = Object.entries(modules)
     const chinese = (text.match(/[\u4e00-\u9fff]/g) || []).length;
     const words = (text.replace(/[\u4e00-\u9fff]/g, ' ').match(/\S+/g) || []).length;
     const minutes = Math.max(1, Math.ceil(chinese / 350 + words / 220));
-    return { ...data, slug, href: `/${slug}.html`, date, updated, minutes, Content: entry.Content, headings: entry.getHeadings(), html: entry.compiledContent() };
+    return { ...data, slug, href: withBase(`/${slug}.html`), date, updated, minutes, Content: entry.Content, headings: entry.getHeadings(), html: entry.compiledContent() };
   })
   .sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug));
 export const tags = [...new Set(posts.flatMap(post => post.tags))];

@@ -4,12 +4,15 @@ interface Props { items: typeof posts; filterable?: boolean }
 const { items, filterable = false } = Astro.props;
 ---
 <div class="post-list">
-  {items.map(post => (
+  {items.map((post, index) => (
     <article class="post-item" data-post={filterable ? '' : undefined} data-search={`${post.title} ${post.description} ${post.tags.join(' ')}`.toLowerCase()} data-tags={JSON.stringify(post.tags)}>
+      <span class="post-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+      <div class="post-item-body">
       <div class="post-meta"><time datetime={post.date}>{displayDate(post.date)}</time><span class="meta-dot">·</span><span>{post.minutes} 分钟阅读</span></div>
       <h2><a href={post.href}>{post.title}</a></h2>
       <p>{post.description}</p>
       <div class="post-tags">{post.tags.map(tag => <span>{tag}</span>)}</div>
+      </div>
     </article>
   ))}
 </div>

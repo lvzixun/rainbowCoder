@@ -1,12 +1,12 @@
 import rss from '@astrojs/rss';
 import type { APIContext } from 'astro';
 import { posts } from '../lib/posts';
-import { site } from '../lib/site.mjs';
+import { site, siteUrl } from '../lib/site.mjs';
 export async function GET(context: APIContext) {
   return rss({
     title: 'rainbowCoder · zixun 的技术笔记',
     description: site.description,
-    site: context.site!,
+    site: siteUrl,
     items: await Promise.all(posts.map(async post => ({
       title: post.title,
       description: post.description,

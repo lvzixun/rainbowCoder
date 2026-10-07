@@ -1,4 +1,5 @@
 ---
+import { withBase } from '../lib/site.mjs';
 import Base from '../layouts/Base.astro';
 import PostList from '../components/PostList.astro';
 import Icon from '../components/Icon.astro';
@@ -6,14 +7,33 @@ import { posts, tags } from '../lib/posts';
 ---
 <Base>
   <section class="intro">
-    <p class="eyebrow"><span class="tiny-rule"></span>ZIXUN’S NOTEBOOK</p>
-    <h1>关于代码的<span class="intro-break"><br /></span><span class="intro-emphasis">一些记录。</span></h1>
-    <p class="intro-description">写过的代码，读过的实现，还有值得记下的思考。<br />关于 Lua、编译器与游戏服务端。</p>
-    <div class="intro-bottom"><span>始于 2014<span class="meta-dot">·</span>{posts.length} 篇笔记</span><a href="/rainbowcoder_rss.xml"><Icon name="rss" size={16} /> 订阅更新</a></div>
+    <div class="intro-copy">
+      <p class="eyebrow terminal-prompt"><span>zixun@rainbowCoder</span><span class="prompt-path">~</span><span>$</span><span class="prompt-command">cat README.md</span></p>
+      <h1>拆开代码，<br /><span class="intro-emphasis">记下思考。</span><span class="hero-cursor" aria-hidden="true">_</span></h1>
+      <p class="intro-description">读源码，造轮子，把问题想明白。<br />关于 Lua、编译器与游戏服务端的探索笔记。</p>
+      <p class="intro-comment">// stay curious. keep building.</p>
+    </div>
+    <div class="terminal-card" aria-label="博客概览">
+      <div class="terminal-toolbar"><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span><span>about.json</span><span class="terminal-filetype">JSON</span></div>
+      <div class="terminal-code">
+        <div><span class="terminal-lineno" aria-hidden="true">01</span><span>{'{'}</span></div>
+        <div><span class="terminal-lineno" aria-hidden="true">02</span><span>  <span class="syntax-key">"author"</span>: <span class="syntax-string">"zixun"</span>,</span></div>
+        <div><span class="terminal-lineno" aria-hidden="true">03</span><span>  <span class="syntax-key">"focus"</span>: [</span></div>
+        <div><span class="terminal-lineno" aria-hidden="true">04</span><span>    <span class="syntax-string">"Lua & runtime"</span>,</span></div>
+        <div><span class="terminal-lineno" aria-hidden="true">05</span><span>    <span class="syntax-string">"Compilers"</span>,</span></div>
+        <div><span class="terminal-lineno" aria-hidden="true">06</span><span>    <span class="syntax-string">"Game servers"</span></span></div>
+        <div><span class="terminal-lineno" aria-hidden="true">07</span><span>  ],</span></div>
+        <div><span class="terminal-lineno" aria-hidden="true">08</span><span>  <span class="syntax-key">"since"</span>: <span class="syntax-number">2014</span>,</span></div>
+        <div><span class="terminal-lineno" aria-hidden="true">09</span><span>  <span class="syntax-key">"notes"</span>: <span class="syntax-number">{posts.length}</span></span></div>
+        <div><span class="terminal-lineno" aria-hidden="true">10</span><span>{'}'}</span></div>
+      </div>
+      <div class="terminal-status"><span>UTF-8</span><span>zixun’s notebook</span></div>
+    </div>
+    <div class="intro-bottom"><span>始于 2014<span class="meta-dot">·</span>{posts.length} 篇笔记</span><a href={withBase('/rainbowcoder_rss.xml')}><Icon name="rss" size={16} /> 订阅更新</a></div>
   </section>
   <div class="home-grid">
     <section class="articles-section" aria-label="文章列表">
-      <div class="section-heading"><h2>全部文章<span id="result-count">{posts.length}</span></h2><span class="section-note">按时间倒序</span></div>
+      <div class="section-heading"><h2><span class="section-path" aria-hidden="true">~/post</span>全部文章<span id="result-count">{posts.length}</span></h2><span class="section-note">最新优先</span></div>
       <div class="mobile-filter"><label for="tag-select" class="sr-only">按主题筛选</label><select id="tag-select"><option value="">全部主题</option>{tags.map(tag => <option value={tag}>{tag}</option>)}</select></div>
       <PostList items={posts} filterable />
       <p class="no-results" hidden>没有找到相关文章。试试其他关键词，或<button id="reset-search" type="button">清除筛选</button>。</p>
@@ -23,8 +43,8 @@ import { posts, tags } from '../lib/posts';
     <aside class="home-sidebar">
       <div class="sidebar-sticky">
         <div class="search-box"><Icon name="search" size={17} /><label for="search" class="sr-only">搜索文章</label><input id="search" type="search" placeholder="搜索文章…" autocomplete="off" /></div>
-        <div class="topic-filter"><h2 class="sidebar-heading">主题</h2><div class="topic-buttons"><button type="button" class="active" data-filter="" aria-pressed="true"><span>全部文章</span><span>{posts.length}</span></button>{tags.map(tag => <button type="button" data-filter={tag} aria-pressed="false"><span>{tag}</span><span>{posts.filter(p => p.tags.includes(tag)).length}</span></button>)}</div></div>
-        <div class="sidebar-note"><span class="note-symbol" aria-hidden="true">{ '{ }' }</span><p>保持好奇，<br />慢慢把事情想明白。</p><a href="/about/">关于 zixun</a></div>
+        <div class="topic-filter"><h2 class="sidebar-heading"><span aria-hidden="true">EXPLORER / </span>主题</h2><div class="topic-buttons"><button type="button" class="active" data-filter="" aria-pressed="true"><span>全部文章</span><span>{posts.length}</span></button>{tags.map(tag => <button type="button" data-filter={tag} aria-pressed="false"><span>{tag}</span><span>{posts.filter(p => p.tags.includes(tag)).length}</span></button>)}</div></div>
+        <div class="sidebar-note"><span class="note-symbol">// README</span><p>保持好奇，<br />慢慢把事情想明白。</p><a href={withBase('/about/')}>关于 zixun</a></div>
       </div>
     </aside>
   </div>

@@ -1,6 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { site } from '../../lib/site.mjs';
+import { site, withBase } from '../../lib/site.mjs';
 ---
 <Base title="关于">
   <header class="page-header"><p class="eyebrow"><span class="tiny-rule"></span>ABOUT</p><h1>你好，我是 zixun。</h1><p>A rainbow coder. ;)</p></header>
@@ -19,6 +19,6 @@ import { site } from '../../lib/site.mjs';
       <h2>关于这个博客</h2>
       <p>文章用 Markdown 编写，源码保存在 GitHub。如果发现错误，欢迎通过邮件或文章下的评论交流。</p>
     </div>
-    <aside class="about-links"><h2>保持联系</h2><a href={site.github}>GitHub / lvzixun</a><a href={`mailto:${site.email}`}>发一封邮件</a><a href="/rainbowcoder_rss.xml">RSS 订阅</a></aside>
+    <aside class="about-links"><h2>保持联系</h2><a href={site.github}>GitHub / lvzixun</a><a href={`mailto:${site.email}`}>发一封邮件</a><a href={withBase('/rainbowcoder_rss.xml')}>RSS 订阅</a></aside>
   </div>
 </Base>

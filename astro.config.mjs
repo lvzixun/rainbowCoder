@@ -1,23 +1,29 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
-import { siteUrl } from './src/lib/site.mjs';
+import { satteri } from '@astrojs/markdown-satteri';
+import { siteOrigin, siteBase, stripBase, withBase } from './src/lib/site.mjs';
+import { markdownLinks } from './src/lib/markdown-links.mjs';
 
 export default defineConfig({
-  site: siteUrl,
+  site: siteOrigin,
+  base: siteBase || '/',
   output: 'static',
   build: { format: 'preserve' },
   integrations: [sitemap({
     serialize(item) {
       const url = new URL(item.url);
-      if (url.pathname === '/about' || url.pathname === '/archive') url.pathname += '/';
-      else if (url.pathname !== '/' && !url.pathname.endsWith('.html')) url.pathname = url.pathname.replace(/\/$/, '') + '.html';
+      let pathname = stripBase(url.pathname);
+      if (pathname === '/about' || pathname === '/archive') pathname += '/';
+      else if (pathname !== '/' && !pathname.endsWith('.html')) pathname = pathname.replace(/\/$/, '') + '.html';
+      url.pathname = withBase(pathname);
       return { ...item, url: url.href };
     },
   })],
   markdown: {
+    processor: satteri({ hastPlugins: [markdownLinks] }),
     syntaxHighlight: 'shiki',
     shikiConfig: {
-      themes: { light: 'github-light', dark: 'github-dark' },
+      themes: { light: 'github-light', dark: 'tokyo-night' },
       defaultColor: false,
       wrap: false,
     },
